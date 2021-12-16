@@ -1,3 +1,6 @@
 git init
 git status
 git add TipsAndTricks.py
+git status
+git add .
+git status
