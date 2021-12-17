@@ -45,7 +45,7 @@ git clean -df
 # even after --hard reset possible:
 git reflog # pick -> hashcode
 git checkout <hashcode>
-
+CHG IHcbclbwkj ch	
 
 
 
