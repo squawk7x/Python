@@ -5,8 +5,11 @@ UNDERSCORE '_'
 
 '''
 
-# returns last output
+# console: returns last output
 # usable as variable which is never used
+
+for _ in range(3):
+	print("Hello")
 
 
 '''
