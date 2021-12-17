@@ -1,12 +1,21 @@
+
+
+'''
+UNDERSCORE '_'
+
+'''
+
+# returns last output
+# usable as variable which is never used
+
+
 '''
 STRINGS
 
 '''
 
-
 name = 'Python'
 print(f'Hello {name} {[1, 2, 3]}')
-
 
 '''
 UNPACKING
@@ -118,6 +127,7 @@ f.close()
 # also other ressources (threads, databases, ...)
 with open('text.txt', 'r') as f:
 	file_contents = f.read()
+	
 
 '''
 INDEXES
@@ -152,10 +162,15 @@ ENUMERATION
 
 '''
 
-enumerate(['a', 'b', 'c'])
+list(enumerate(['a', 'b', 'c']))  # [(0, 'a'), (1, 'b'), (2, 'c')]
+
+it = iter(enumerate(['a', 'b', 'c']))
+next(it)
 
 for i, item in enumerate(['a', 'b', 'c']):
-	print (i, item)
+	print(i, item)
+
+list(enumerate(enumerate(['a', 'b', 'c'])))  #  [(0, (0, 'a')), (1, (1, 'b')), (2, (2, 'c'))]
 
 
 '''
@@ -292,7 +307,7 @@ def outer():
 
 outer()
 
-# ------------------------------------------------
+
 '''
 MAIN
 
@@ -308,7 +323,7 @@ def main():
 if __name__ == '__main__':
 	main()
 
-# ------------------------------------------------
+
 
 '''
 EXCEPTIONS
@@ -329,7 +344,7 @@ else:
 finally:
 	print("Executing finally...")
 
-# ------------------------------------------------
+
 '''
 FIRST CLASS FUNCTION
 
@@ -358,7 +373,7 @@ def my_map(func, arg_list):
 my_map(square, [1, 2, 3, 4, 5])
 my_map(cube, [1, 2, 3, 4, 5])
 
-# ------------------------------------------------
+
 '''
 CLOSURES
 
