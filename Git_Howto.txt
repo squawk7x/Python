@@ -1,4 +1,6 @@
 git init
+git --help
+git <befehl> -help
 git config --global user.name "username"
 git config --global user.email "email"
 git config --global core.editor gedit
@@ -51,6 +53,32 @@ git clean -df
 # even after --hard reset possible:
 git reflog # pick -> hashcode
 git checkout <hashcode>
+
+# remote aktualisieren
+git push <remote-name> <branch-name>
+git push origin master
+
+# upstream mit u parameter setzen:
+git push -u origin master	# lokaler master ist mit remote master automatisch verknüpft
+git push	
+
+git clone <remote-url> .
+git pull origin master
+git pull 	# mit gesetztem master 
+
+# git pull macht 2 Sachen:
+git fetch 	
+git merge
+
+git remote add origin https://github.com/squawk7x/Python.git
+git remote 
+git remote -v
+git push -u origin master
+
+
+
+
+
 
 
 
