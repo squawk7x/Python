@@ -8,7 +8,13 @@ git status
 git branch
 git branch -b "name_of _new_branch"
 git add <file>
+git add -A
+git add .
 git commit -m "text commit"
+git log
+git clone <url> <where to clone>
+git remote -v
+git branch -a
 git pull
 git push
 
