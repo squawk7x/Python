@@ -80,6 +80,17 @@ lst.sort(key=sort_func)
 print(lst)
 
 
+#-------------------------------------------------
+
+data = [{'name': 'Max', 'age': 6},
+        {'name': 'Lisa', 'age': 20},
+        {'name': 'Ben', 'age': 9}]
+
+# sort by name:
+
+sorted_data = sorted(data, key=lambda x: x['age'])
+print(sorted_data)
+
 '''
 if else
 
