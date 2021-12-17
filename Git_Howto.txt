@@ -18,8 +18,24 @@ git branch -a
 git diff
 git status
 git add -A
-git pull
-git push
+git pull origin master
+git push origin master
+git branch <new branch>
+git checkout <new branch>
+git push -u origin <new branch>
+git branch -a
+git checkout master
+git pull origin master
+git branch --merged
+git merge <file>
+git push origin master
+# inside from master branch:
+git merge newbranch 
+# upload to remote master
+git push origin master
+
+
+
 
 
 
