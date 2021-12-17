@@ -14,8 +14,10 @@ git add <file>
 git add -A
 git add .
 git commit -m "text commit"
+git commit -a -m "direct commit w/o staging"
 git log
 git log --pretty=oneline
+git log --pretty=oneline --graph
 git clone <url> <where to clone>
 git remote -v
 git branch -a
