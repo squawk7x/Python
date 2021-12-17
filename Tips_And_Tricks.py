@@ -1,13 +1,15 @@
 '''
-Strings
+STRINGS
 
 '''
+
 
 name = 'Python'
 print(f'Hello {name} {[1, 2, 3]}')
 
+
 '''
-Unpacking
+UNPACKING
 
 '''
 
@@ -20,7 +22,7 @@ x, y = dic.items()
 print(x, y)
 
 '''
-Multiple Assignment / Values Swap
+MULTIPLE ASSIGNMENT / VALUE SWAP
 
 '''
 x, y = 1, 2
@@ -29,7 +31,7 @@ x, y = 1, 2
 x, y = y, x
 
 '''
-Comprehensions
+COMPREHENSIONS
 
 '''
 x = [[0 for _ in range(5)] for _ in range(5)]
@@ -41,7 +43,7 @@ x = {char: sentence.count(char) for char in set(sentence)}
 print(x)
 
 '''
-Inline / Ternary Condition
+TERNARY CONDITION (INLINE CONDITION)
 
 '''
 
@@ -63,18 +65,20 @@ else:
 	print('not found')
 
 '''
-Sort by key
+SORT BY KEY
 
 '''
 
-lst = [[1,2], [3,4], [4,2],[-1,3],[4,5],[2,3]]
-lst.sort() # by first element, no Python function for 2nd element -> lamda
+lst = [[1, 2], [3, 4], [4, 2], [-1, 3], [4, 5], [2, 3]]
+lst.sort()  # by first element, no Python function for 2nd element -> lamda
 print(lst)
-lst.sort(key=lambda x:x[1])
+lst.sort(key=lambda x: x[1])
 print(lst)
+
 
 def sort_func(x):
 	return x[0] + x[1]
+
 
 lst.sort(key=sort_func)
 print(lst)
@@ -116,7 +120,7 @@ with open('text.txt', 'r') as f:
 	file_contents = f.read()
 
 '''
-Indexes
+INDEXES
 
 '''
 
@@ -144,7 +148,18 @@ for value in zip(names, heroes, universes):
 	print(value)
 
 '''
-Unpacking Values
+ENUMERATION
+
+'''
+
+enumerate(['a', 'b', 'c'])
+
+for i, item in enumerate(['a', 'b', 'c']):
+	print (i, item)
+
+
+'''
+UNPACKING
 
 '''
 a, b = (1, 2)
@@ -163,7 +178,7 @@ print(c)
 print(d)
 
 '''
-Assigning Attributes
+ASSIGNING ATTRIBUTES
 
 '''
 
@@ -206,7 +221,7 @@ password = getpass('Password: ')
 # Konsole: python -m modulname
 
 '''
-Argument Evaluation
+ARGUMENT EVALUATION
 
 Python evaluates default arguments only once
 at the time the function is created and
@@ -235,8 +250,10 @@ add_name2('A')  # ['A']
 add_name2('B')  # ['B']
 
 '''
-LEGB - Local, Enclosing, Global, Built-in
-Enclosing when using nested functions
+SCOPE
+
+LEGB -  Local, Enclosing, Global, Built-in
+		Enclosing when using nested functions
 
 '''
 
@@ -276,6 +293,10 @@ def outer():
 outer()
 
 # ------------------------------------------------
+'''
+MAIN
+
+'''
 
 print("this module's name: {}".format(__name__))
 
@@ -288,6 +309,11 @@ if __name__ == '__main__':
 	main()
 
 # ------------------------------------------------
+
+'''
+EXCEPTIONS
+
+'''
 
 try:
 	f = open('testfile.txt')
@@ -468,12 +494,6 @@ IDEMPOTENCE
 
 f(f(x)) = f(x)
 
-HTTP METHODS:
-GET
-PUT
-(POST is not)
-DELETE
-
 '''
 
 # f(x) = abs(x)
@@ -519,7 +539,7 @@ for key, val in my_dict.items():  # iteritems()?
 
 # ------------------------------------------------
 '''
-GENERATOR
+GENERATORS
 
 '''
 
