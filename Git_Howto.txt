@@ -50,7 +50,7 @@ git clean -df
 git reflog # pick -> hashcode
 git checkout <hashcode>
 
-git rm dateiname.txt
+
 
 
 
