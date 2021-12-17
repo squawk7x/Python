@@ -1,7 +1,9 @@
 git init
 git config --global user.name "username"
 git config --global user.email "email"
-git config --global core.editor notepadqq
+git config --global core.editor gedit
+git config --global diff.tool meld
+git config --global --add difftool.prompt false
 git config --list
 git config --help
 git help config
@@ -13,6 +15,7 @@ git add -A
 git add .
 git commit -m "text commit"
 git log
+git log --pretty=oneline
 git clone <url> <where to clone>
 git remote -v
 git branch -a
@@ -47,7 +50,7 @@ git clean -df
 git reflog # pick -> hashcode
 git checkout <hashcode>
 
-#
+git rm dateiname.txt
 
 
 
