@@ -1,4 +1,16 @@
 git init
+git config --global user.name "username"
+git config --global user.email "email"
+git config --list
+git config --help
+git help config
+git status
+git branch
+git branch -b "name_of _new_branch"
+git add <file>
+git commit -m "text commit"
+git pull
+git push
 
 
 
