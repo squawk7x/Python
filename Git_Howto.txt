@@ -33,7 +33,18 @@ git push origin master
 git merge newbranch 
 # upload to remote master
 git push origin master
-
+git commit --amend -m "new message"
+git checkout <branch>
+git cherry-pick <hashcode>
+git log
+git reset --soft|mixed|--hard <hashcode>
+git status
+# -- hard reset only tracked files
+# delete untracked files:
+git clean -df
+# even after --hard reset possible:
+git reflog # pick -> hashcode
+git checkout <hashcode>
 
 
 
