@@ -47,6 +47,7 @@ git clean -df
 git reflog # pick -> hashcode
 git checkout <hashcode>
 
+#
 
 
 
