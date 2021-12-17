@@ -1,6 +1,7 @@
 git init
 git config --global user.name "username"
 git config --global user.email "email"
+git config --global core.editor notepadqq
 git config --list
 git config --help
 git help config
@@ -45,7 +46,7 @@ git clean -df
 # even after --hard reset possible:
 git reflog # pick -> hashcode
 git checkout <hashcode>
-CHG IHcbclbwkj ch	
+
 
 
 
