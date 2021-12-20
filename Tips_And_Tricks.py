@@ -1,3 +1,45 @@
+'''
+PYDOC
+
+python -m pydoc <name>
+python -m pydoc -k <keyword>
+python -m pydoc -p 345 -> localhost:345
+python -m pydoc -b -> The best!
+python -m pydoc -w <name> -> create own documentation od <name>
+
+'''
+
+'''
+INTERACTIVE HELP
+
+'''
+dir()
+dir(__builtins__)
+help(pow)
+
+
+def empty_func():
+	"""empty function"""
+	pass
+
+
+help(empty_func)
+
+'''
+DATETIME
+
+'''
+
+import datetime
+
+dir(datetime)  # date, time, datetime
+
+gvr = datetime.date(1956, 1, 31)
+print(gvr)
+print(gvr.strftime('%A, %B %d, %Y'))
+
+message = 'GVR was born on {:%A, %B %d, %Y}.'
+print(message.format(gvr))
 
 '''
 UNDERSCORE '_'
@@ -10,14 +52,178 @@ UNDERSCORE '_'
 for _ in range(3):
 	print("Hello")
 
+'''
+SETS
+
+'''
+
+example = {1, 'A', 'Hello'}
+example.remove(1)
+example.remove(2)  # KeyError: 2
+example.discard(2)  # no KeyError: 2 message / silent
+
+'''
+DICTIONARY
+
+item = key: value
+
+'''
+
+messages = {'one': 1, 'two': 2, 'three': 3}
+
+messages.keys()  # dict_keys(['one', 'two', 'three'])
+messages.values()  # dict_values([1, 2, 3])
+messages.items()  # dict_items([('one', 1), ('two', 2), ('three', 3)])
+
+for key in messages:
+	print(key, '-->', messages.get(key))
+
+for key in messages.keys():
+	value = messages[key]
+	print(key, '-->', value)
+
+for key, value in messages.items():
+	print(key, '-->', value)
+
+'''
+LIST <--> TUPLE
+
+add         --
+remove      --
+change      --
+
+mutable  immutable
+		made quickly
+
+'''
+
+list_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+tuple_numbers = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+print(f'List methods ({len(dir(list_numbers))}):')
+print(dir(list_numbers))
+
+print(f'Tuple methods ({len(dir(tuple_numbers))}):')
+print(dir(tuple_numbers))
+
+''' Lists occupy more memory than Tuples'''
+import sys
+
+print(dir(sys))  # 'getsizeof'
+print(help(sys.getsizeof))  # Return the size of object in bytes.
+
+print(f'list_numbers: {sys.getsizeof(list_numbers)} bytes')
+print(f'tuple_numbers: {sys.getsizeof(tuple_numbers)} bytes')
+
+'''Tuples can be made more quickly'''
+import timeit
+
+list_test = timeit.timeit(stmt="[1, 2, 3, 4, 5]", number=1000000)
+tuple_test = timeit.timeit(stmt="(1, 2, 3, 4, 5)", number=1000000)
+print("List time: ", list_test)
+print("Tuple time: ", tuple_test)
+print(80 * "-")
+
+'''
+FUNCTIONS
+
+'''
+
+
+def f():
+	pass
+
+
+f  # <function __main__.f()>
+
+'''
+LAMBDA FUNCTION
+
+'''
+
+lambda x: 3 * x + 1  # Out[9]: <function __main__.<lambda>(x)>
+g = lambda x: 3 * x + 1
+g(5)
+
+full_name = lambda fn, ln: fn.strip().title() + ' ' + ln.strip().title()
+full_name("   leonhard ", "EULER")
+
+
+def build_quadratic_function(a, b, c):
+	'''Returns the function f(x) = ax^2 + bx +c'''
+	return lambda x: a * x ** 2 + b * x + c
+
+
+build_quadratic_function(2, 3, -5)(2)
+
+f = build_quadratic_function(2, 3, -5)
+f(2)
+
+'''
+MAP FUNCTION
+
+'''
+
+# map(func, *iterables) --> map object
+
+list(map(lambda _: _ ** 2, (1, 2, 3, 4, 5)))
+
+'''
+FILTER FUNCTION
+
+'''
+
+import statistics
+
+data = (1.3, 2.7, 0.8, 4.1, 4.3, -0.1)
+avg = statistics.mean(data)
+list(filter(lambda x: x > avg, data))
+
+data = ['', 'zwei', '', 'vier']
+list(filter(None, data))  # ['zwei', 'vier']
+# False: "", 0, 0.0, 0j, [], (),{}, False, None, empty instances
+
 
 '''
 STRINGS
 
 '''
 
+'I\'m text'
+"""I'm text"""
+'''I'm text too'''
+
 name = 'Python'
 print(f'Hello {name} {[1, 2, 3]}')
+
+string_plus = """I'm
+	in "several" lines"""
+print(string_plus)
+
+'''
+NUMBERS IN PYTHON3
+
+	complex numbers
+    floats
+    (longs)
+	ints
+
+'''
+
+int, float, complex
+
+e = 2.7_1828_1828
+type(e)  # float
+
+c = 2 - 6.1j
+type(c)  # complex
+c.real
+c.imag
+
+hex(10)  # '0xa' (output is a string)
+0xa  # 10 (output is a int)
+type(0xa)
+5 + True  # 6
 
 '''
 UNPACKING
@@ -31,6 +237,13 @@ x, y = dic.values()
 print(x, y)
 x, y = dic.items()
 print(x, y)
+
+x = {'a': 1, 'b': 2}
+y = {'b': 3, 'c': 4}
+
+z = {**x, **y}
+
+print(z)
 
 '''
 MULTIPLE ASSIGNMENT / VALUE SWAP
@@ -94,6 +307,28 @@ def sort_func(x):
 lst.sort(key=sort_func)
 print(lst)
 
+'''
+SORTING
+
+dict by value
+'''
+
+
+# How to sort a Python dict by value
+# (== get a representation sorted by value)
+
+xs = {'a': 4, 'b': 3, 'c': 2, 'd': 1}
+
+sorted(xs.items(), key=lambda x: x[1])
+[('d', 1), ('c', 2), ('b', 3), ('a', 4)]
+
+# Or:
+
+import operator
+sorted(xs.items(), key=operator.itemgetter(1))
+[('d', 1), ('c', 2), ('b', 3), ('a', 4)]
+
+
 # -------------------------------------------------
 
 data = [{'name': 'Max', 'age': 6},
@@ -127,9 +362,8 @@ f.close()
 
 # automatic close file -> Contextmanager:
 # also other ressources (threads, databases, ...)
-with open('text.txt', 'r') as f:
+with open('test.txt', 'r') as f:
 	file_contents = f.read()
-	
 
 '''
 INDEXES
@@ -172,8 +406,7 @@ next(it)
 for i, item in enumerate(['a', 'b', 'c']):
 	print(i, item)
 
-list(enumerate(enumerate(['a', 'b', 'c'])))  #  [(0, (0, 'a')), (1, (1, 'b')), (2, (2, 'c'))]
-
+list(enumerate(enumerate(['a', 'b', 'c'])))  # [(0, (0, 'a')), (1, (1, 'b')), (2, (2, 'c'))]
 
 '''
 UNPACKING
@@ -184,8 +417,8 @@ print(a)
 # print(b)
 a, _ = (1, 2)
 print(a)
-a, b, c = (1, 2)  # Error
-a, b, c = (1, 2, 3, 4, 5)  # Error
+# a, b, c = (1, 2)  # Error
+# a, b, c = (1, 2, 3, 4, 5)  # Error
 a, b, *_ = (1, 2, 3, 4, 5)
 print(a)
 print(b)
@@ -309,7 +542,6 @@ def outer():
 
 outer()
 
-
 '''
 MAIN
 
@@ -325,8 +557,6 @@ def main():
 if __name__ == '__main__':
 	main()
 
-
-
 '''
 EXCEPTIONS
 
@@ -340,12 +570,11 @@ except FileNotFoundError as e:
 	print(e)
 except Exception as e:
 	print(e)
-else:
+else:  # if no exceptions in try block
 	print(f.read())
 	f.close()
-finally:
+finally:  # always executed
 	print("Executing finally...")
-
 
 '''
 FIRST CLASS FUNCTION
@@ -374,7 +603,6 @@ def my_map(func, arg_list):
 
 my_map(square, [1, 2, 3, 4, 5])
 my_map(cube, [1, 2, 3, 4, 5])
-
 
 '''
 CLOSURES
@@ -439,7 +667,6 @@ print('Adress of a is: {}'.format(id(a)))  # same address
 MEMOIZATION
 
 '''
-
 import time
 
 ef_cache = {}
