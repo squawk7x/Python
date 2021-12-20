@@ -44,45 +44,45 @@ class Card:
 
 class Deck:
 	''' Represents a full card deck
-	with a closed drawpile and an open stack '''
+	with a closed deck and an open stack '''
 	
 	def __init__(self):
-		self.drawpile = []
+		self.blind = []
 		self.stack = []
 		
 		for suit in suits:
 			for rank in ranks:
-				self.drawpile.append(Card(suit, rank))
+				self.blind.append(Card(suit, rank))
 		
-		#self.shuffle_drawpile()
+		#self.shuffle_blind()
 	
-	''' drawpile methods '''
-	def shuffle_drawpile(self):
-		random.shuffle(self.drawpile)
+	''' deck methods '''
+	def shuffle_blind(self):
+		random.shuffle(self.blind)
 	
-	def show_drawpile(self):
-		print([str(card) for card in self.drawpile])
+	def show_blind(self):
+		print([str(card) for card in self.blind])
 	
-	def draw_card(self):
-		if len(self.drawpile) == 0:
-			self.drawpile = self.stack
+	def draw_blind(self):
+		if len(self.blind) == 0:
+			self.blind = self.stack
 			self.stack = []
-		# random.shuffle(self.drawpile)
-		return self.drawpile.pop()
+		random.shuffle(self.blind)
+		return self.blind.pop()
 	
 	''' stack methods '''
-	def put_card(self, card):
+	def put_stack(self, card):
 		self.stack.append(card)
 	
 	def show_stack(self):
 		print([str(card) for card in self.stack])
 		
-	def get_stackcard(self):
+	def what_is_stack(self):
 		return self.stack[-1]
 	
 
 deck = Deck()
-deck.show_drawpile()
+deck.show_blind()
 deck.show_stack()
 
 
@@ -105,44 +105,51 @@ class Player:
 	def show_hand(self):
 		print([str(card) for card in self.hand])
 	
-	def show_possible(self):
+	def show_possible_cards(self):
+		self.calculate_possible_cards()
 		print([str(card) for card in self.possible])
 	
 	def get_card(self):
-		self.hand.append(deck.draw_card())
+		self.hand.append(deck.draw_blind())
 
 	def calculate_possible_cards(self):
 		for card in self.hand:
-			if card.__eq__(deck.get_stackcard()):
+			if card.__eq__(deck.what_is_stack()):
 				self.possible.append(card)
 		return self.possible
 
 	def play(self):
 		self.calculate_possible_cards()
 		while self.possible:
-
-			deck.put_card(self.possible.pop())
-			self.hand.remove()
+			card =self.possible.pop()
+			deck.put_stack(card)
+			self.hand.remove(card)
 			self.calculate_possible_cards()
 
 
 p1 = Player('Computer')
 p2 = Player('Player 2')
 
-print('Drawpile:', len(deck.drawpile))
-deck.show_drawpile()
+print('Deck:', len(deck.blind))
+deck.show_blind()
 print('Stack: ', len(deck.stack))
 deck.show_stack()
 
-print(p1.name, ':', p1.show_hand())
-print(p2.name, ':', p2.show_hand())
+print(p1.name, ':')
+p1.show_hand()
+print(p1.name, 'Options:')
+p1.show_possible_cards()
 
-print('Drawpile:', len(deck.drawpile))
-deck.show_drawpile()
+print(p2.name, ':')
+p2.show_hand()
+print(p2.name, 'Options:')
+p2.show_possible_cards()
+
+
+print('Deck:', len(deck.blind))
+deck.show_blind()
 print('Stack: ', len(deck.stack))
 deck.show_stack()
-
-'''
 
 
 while True:
@@ -150,12 +157,11 @@ while True:
 	deck.show_stack()
 	
 	print('Possible Cards Player 1: ')
-	print(p1.show_hand())
-	print(p1.show_possible())
+	p1.show_hand()
+	p1.show_possible_cards()
 	p1.play()
 	
 	print('Stack: ', len(deck.stack))
 	deck.show_stack()
 
-'''
 
