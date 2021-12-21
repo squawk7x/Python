@@ -17,7 +17,7 @@ class Card:
 		return '{} {}'.format(self.suit, self.rank)
 	
 	def __eq__(self, other):
-		if self.rank == other.rank or self.suit == other.suit or self.rank == 'J':
+		if self.rank == other.rank or self.suit == other.suit:  # or self.rank == 'J':
 			return True
 		else:
 			return False
@@ -99,20 +99,26 @@ class Handdeck:
 	
 	def __init__(self):
 		self.cards = []
+		self.possible_cards = []
 	
 	def count_points(self):
 		points = 0
 		for card in self.cards:
 			points += card.value
 		return points
+
+	def remove_card(self, card: Card):
+		for c in self.cards:
+			if c.suit == card.suit and c.rank == card.rank:
+				self.cards.remove(card)
 	
 	def get_possible_cards(self):
 		self.possible_cards = []
 		for card in self.cards:
 			if card.__eq__(deck.get_top_card_from_stack()):
-				self.possible_cards.append(card)
+					self.possible_cards.append(card)
 		return self.possible_cards
-
+	
 
 class Player:
 	''' Represents a player with cards in hand '''
@@ -135,12 +141,11 @@ class Player:
 	def get_card_from_blind(self):
 		self.hand.cards.append(deck.draw_card_from_blind())
 	
-	''' TODO '''
-	
 	def put_card_on_stack(self):
 		if self.hand.possible_cards:
 			deck.put_card_on_stack(self.hand.possible_cards.pop())
-			self.hand.cards.remove(deck.get_top_card_from_stack())
+			'''' TODO '''
+			self.hand.remove_card(deck.get_top_card_from_stack())
 	
 	def show_hand(self):
 		print(f'{self.name} holds ({len(self.hand.cards)}) card(s):')
@@ -159,7 +164,6 @@ class Player:
 		print([str(card) for card in self.hand.cards])
 		print([str(card) for card in self.hand.possible_cards])
 		
-
 
 deck.show()
 p1 = Player('Player 1')
