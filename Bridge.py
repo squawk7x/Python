@@ -73,8 +73,10 @@ class Deck:
 		if not self.blind:
 			self.blind = self.stack
 			self.stack = []
-		# random.shuffle(self.blind)
-		return self.blind.pop()
+			self.stack.append(self.blind.pop())
+			# random.shuffle(self.blind)
+		if self.blind:
+			return self.blind.pop()  # there was more than 1 card on stack
 	
 	''' stack methods '''
 	
@@ -126,10 +128,12 @@ class Player:
 	def get_card_from_blind(self):
 		self.hand.cards.append(deck.draw_card_from_blind())
 	
+	''' TODO '''
 	def put_card_on_stack(self):
-		deck.show_stack()
-		self.hand.get_possible_cards()
-		deck.put_card_on_stack(self.hand.cards.pop())
+		if self.hand.possible_cards:
+			deck.put_card_on_stack(self.hand.possible_cards.pop())
+			self.hand.cards.remove(deck.get_top_card_from_stack())
+
 	
 	def show_hand(self):
 		print(f'{self.name} holds ({len(self.hand.cards)}) card(s):')
@@ -139,37 +143,36 @@ class Player:
 		print(f'{self.name} can play ({len(self.hand.get_possible_cards())}) card(s):')
 		print([str(card) for card in self.hand.get_possible_cards()])
 		
+	def toggle_possible_cards(self):
+		#self.hand.possible_cards = self.hand.get_possible_cards()
+		if self.hand.possible_cards:
+			self.hand.possible_cards.insert(0, self.hand.possible_cards.pop())
+		print([str(card) for card in self.hand.cards])
+		print([str(card) for card in self.hand.possible_cards])
+		
+	
 
 
 deck.show()
-
 p1 = Player('Player 1')
-
-
 deck.show()
 p1.show()
 
-p1.put_card_on_stack()
-deck.show()
-p1.show()
 
-p1.put_card_on_stack()
-deck.show()
-p1.show()
-
-p1.get_card_from_blind()
-deck.show()
-p1.show()
-
-p1.get_card_from_blind()
-deck.show()
-p1.show()
-
-p1.put_card_on_stack()
-deck.show()
-p1.show()
-
-p1.get_card_from_blind()
-deck.show()
-p1.show()
-
+while True:
+	key = input('s -> card to Stack | b -> card from Blind: | (q)uit')
+	if key == 's':
+		p1.put_card_on_stack()
+		deck.show()
+		p1.show()
+	elif key == 't':
+		p1.toggle_possible_cards()
+		
+	elif key == 'q':
+		
+		break
+	else:
+		p1.get_card_from_blind()
+		deck.show()
+		p1.show()
+		
