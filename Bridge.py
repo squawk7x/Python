@@ -53,7 +53,7 @@ class Deck:
 		for suit in suits:
 			for rank in ranks:
 				self.blind.append(Card(suit, rank))
-				
+	
 	def show(self):
 		self.show_blind()
 		self.show_stack()
@@ -74,7 +74,7 @@ class Deck:
 			self.blind = self.stack
 			self.stack = []
 			self.stack.append(self.blind.pop())
-			# random.shuffle(self.blind)
+		# random.shuffle(self.blind)
 		if self.blind:
 			return self.blind.pop()  # there was more than 1 card on stack
 	
@@ -93,11 +93,18 @@ class Deck:
 
 deck = Deck()
 
+
 class Handdeck:
 	''' Represents the players cards with "some" functionality '''
 	
 	def __init__(self):
 		self.cards = []
+	
+	def count_points(self):
+		points = 0
+		for card in self.cards:
+			points += card.value
+		return points
 	
 	def get_possible_cards(self):
 		self.possible_cards = []
@@ -120,44 +127,44 @@ class Player:
 		''' open first card on stack '''
 		if not deck.stack:
 			deck.stack.append(self.hand.cards.pop())
-			
+	
 	def show(self):
 		self.show_hand()
 		self.show_possible_cards()
-			
+	
 	def get_card_from_blind(self):
 		self.hand.cards.append(deck.draw_card_from_blind())
 	
 	''' TODO '''
+	
 	def put_card_on_stack(self):
 		if self.hand.possible_cards:
 			deck.put_card_on_stack(self.hand.possible_cards.pop())
 			self.hand.cards.remove(deck.get_top_card_from_stack())
-
 	
 	def show_hand(self):
 		print(f'{self.name} holds ({len(self.hand.cards)}) card(s):')
 		print([str(card) for card in self.hand.cards])
-		
+		print(f'handdeck values {self.hand.count_points()} points')
+	
 	def show_possible_cards(self):
 		print(f'{self.name} can play ({len(self.hand.get_possible_cards())}) card(s):')
-		print([str(card) for card in self.hand.get_possible_cards()])
-		
+		print(f'{[str(card) for card in self.hand.get_possible_cards()]} --> '
+		      f'[{str(deck.get_top_card_from_stack())}]')
+	
 	def toggle_possible_cards(self):
-		#self.hand.possible_cards = self.hand.get_possible_cards()
+		# self.hand.possible_cards = self.hand.get_possible_cards()
 		if self.hand.possible_cards:
 			self.hand.possible_cards.insert(0, self.hand.possible_cards.pop())
 		print([str(card) for card in self.hand.cards])
 		print([str(card) for card in self.hand.possible_cards])
 		
-	
 
 
 deck.show()
 p1 = Player('Player 1')
 deck.show()
 p1.show()
-
 
 while True:
 	key = input('s -> card to Stack | b -> card from Blind: | (q)uit')
@@ -167,7 +174,9 @@ while True:
 		p1.show()
 	elif key == 't':
 		p1.toggle_possible_cards()
-		
+		deck.show()
+		p1.show()
+	
 	elif key == 'q':
 		
 		break
@@ -175,4 +184,3 @@ while True:
 		p1.get_card_from_blind()
 		deck.show()
 		p1.show()
-		
