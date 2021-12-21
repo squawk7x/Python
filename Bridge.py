@@ -53,115 +53,123 @@ class Deck:
 		for suit in suits:
 			for rank in ranks:
 				self.blind.append(Card(suit, rank))
-		
-		#self.shuffle_blind()
+				
+	def show(self):
+		self.show_blind()
+		self.show_stack()
+	
+	# self.shuffle_blind()
 	
 	''' deck methods '''
+	
 	def shuffle_blind(self):
 		random.shuffle(self.blind)
 	
 	def show_blind(self):
+		print(f'Blind ({len(self.blind)}) card(s):')
 		print([str(card) for card in self.blind])
 	
-	def draw_blind(self):
-		if len(self.blind) == 0:
+	def draw_card_from_blind(self):
+		if not self.blind:
 			self.blind = self.stack
 			self.stack = []
-		random.shuffle(self.blind)
+		# random.shuffle(self.blind)
 		return self.blind.pop()
 	
 	''' stack methods '''
-	def put_stack(self, card):
+	
+	def put_card_on_stack(self, card):
 		self.stack.append(card)
 	
 	def show_stack(self):
+		print(f'Stack ({len(self.stack)}) card(s):')
 		print([str(card) for card in self.stack])
-		
-	def what_is_stack(self):
-		return self.stack[-1]
 	
+	def get_top_card_from_stack(self):
+		return self.stack[-1]
+
 
 deck = Deck()
-deck.show_blind()
-deck.show_stack()
 
+class Handdeck:
+	''' Represents the players cards with "some" functionality '''
+	
+	def __init__(self):
+		self.cards = []
+	
+	def get_possible_cards(self):
+		self.possible_cards = []
+		for card in self.cards:
+			if card.__eq__(deck.get_top_card_from_stack()):
+				self.possible_cards.append(card)
+		return self.possible_cards
 
 
 class Player:
 	''' Represents a player with cards in hand '''
 	
 	def __init__(self, name=None):
-		self.hand = []
-		self.possible = []
 		self.name = name
+		self.hand = Handdeck()
 		
 		for _ in range(5):
-			self.get_card()
+			self.get_card_from_blind()
 		
-		''' Eröffnungskarte '''
-		if deck.stack == []:
-			deck.stack.append(self.hand.pop())
+		''' open first card on stack '''
+		if not deck.stack:
+			deck.stack.append(self.hand.cards.pop())
+			
+	def show(self):
+		self.show_hand()
+		self.show_possible_cards()
+			
+	def get_card_from_blind(self):
+		self.hand.cards.append(deck.draw_card_from_blind())
+	
+	def put_card_on_stack(self):
+		deck.show_stack()
+		self.hand.get_possible_cards()
+		deck.put_card_on_stack(self.hand.cards.pop())
 	
 	def show_hand(self):
-		print([str(card) for card in self.hand])
-	
+		print(f'{self.name} holds ({len(self.hand.cards)}) card(s):')
+		print([str(card) for card in self.hand.cards])
+		
 	def show_possible_cards(self):
-		self.calculate_possible_cards()
-		print([str(card) for card in self.possible])
-	
-	def get_card(self):
-		self.hand.append(deck.draw_blind())
-
-	def calculate_possible_cards(self):
-		for card in self.hand:
-			if card.__eq__(deck.what_is_stack()):
-				self.possible.append(card)
-		return self.possible
-
-	def play(self):
-		self.calculate_possible_cards()
-		while self.possible:
-			card =self.possible.pop()
-			deck.put_stack(card)
-			self.hand.remove(card)
-			self.calculate_possible_cards()
+		print(f'{self.name} can play ({len(self.hand.get_possible_cards())}) card(s):')
+		print([str(card) for card in self.hand.get_possible_cards()])
+		
 
 
-p1 = Player('Computer')
-p2 = Player('Player 2')
+deck.show()
 
-print('Deck:', len(deck.blind))
-deck.show_blind()
-print('Stack: ', len(deck.stack))
-deck.show_stack()
-
-print(p1.name, ':')
-p1.show_hand()
-print(p1.name, 'Options:')
-p1.show_possible_cards()
-
-print(p2.name, ':')
-p2.show_hand()
-print(p2.name, 'Options:')
-p2.show_possible_cards()
+p1 = Player('Player 1')
 
 
-print('Deck:', len(deck.blind))
-deck.show_blind()
-print('Stack: ', len(deck.stack))
-deck.show_stack()
+deck.show()
+p1.show()
 
+p1.put_card_on_stack()
+deck.show()
+p1.show()
 
-while True:
-	print('Stack: ', len(deck.stack))
-	deck.show_stack()
-	
-	print('Possible Cards Player 1: ')
-	p1.show_hand()
-	p1.show_possible_cards()
-	p1.play()
-	
-	print('Stack: ', len(deck.stack))
-	deck.show_stack()
+p1.put_card_on_stack()
+deck.show()
+p1.show()
 
+p1.get_card_from_blind()
+deck.show()
+p1.show()
+
+p1.get_card_from_blind()
+deck.show()
+p1.show()
+
+p1.put_card_on_stack()
+deck.show()
+p1.show()
+
+p1.get_card_from_blind()
+deck.show()
+p1.show()
 
