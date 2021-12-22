@@ -4,6 +4,13 @@ suits = ['\u2666', '\u2665', '\u2660', '\u2663']
 ranks = ["6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 
 
+class bcolors:
+	diamond = '\033[92m'  # GREEN
+	heart = '\033[91m'  # RED
+	spate = '\033[93m'  # YELLOW
+	RESET = '\033[0m'  # RESET COLOR
+
+
 class Card:
 	''' Represents a single playing card '''
 	
@@ -64,7 +71,8 @@ class Deck:
 	
 	def show_blind(self):
 		print(f'Blind ({len(self.blind)}) card(s):')
-		print([str(card) for card in self.blind])
+		#print([str(card) for card in self.blind])
+		print(len(self.blind) * '#')
 	
 	def shuffle_blind(self):
 		random.shuffle(self.blind)
@@ -82,7 +90,8 @@ class Deck:
 	
 	def show_stack(self):
 		print(f'Stack ({len(self.stack)}) card(s):')
-		print([str(card) for card in self.stack])
+		#print([str(card) for card in self.stack])
+		print(f'{str(self.stack[-1])}{(len(self.stack)-1) * "#"}')
 	
 	def put_card_on_stack(self, card):
 		self.stack.append(card)
@@ -152,9 +161,8 @@ class Player:
 		self.show_possible_cards()
 	
 	def show_hand(self):
-		print(f'{self.name} holds ({len(self.hand.cards)}) card(s):')
+		print(f'{self.name} holds ({len(self.hand.cards)}) card(s) with [{self.hand.count_points()} points]:')
 		print([str(card) for card in self.hand.cards])
-		print(f'handdeck values {self.hand.count_points()} points')
 	
 	def show_possible_cards(self):
 		print(f'{self.name} can play ({len(self.hand.get_possible_cards())}) card(s):')
@@ -179,24 +187,47 @@ class Player:
 			deck.put_card_on_stack(card)
 
 
-p1 = Player('Player 1')
+class Game:
+	player_list = []
+	
+	def __init__(self):
+		number_of_players = int(input(f"{bcolors.RESET}How many players?{bcolors.RESET}"))
+		
+		for player in range(number_of_players):
+			self.player_list.append(Player(f'Player-{player}'))
+
+
+game = Game()
+
+p0 = game.player_list.__getitem__(0)
+p1 = game.player_list.__getitem__(1)
 deck.show()
+p0.show()
 p1.show()
 
 while True:
 	key = input('s -> card to Stack | b -> card from Blind: | (q)uit')
+	
 	if key == 'q':
 		break
-	elif key == 's':
-		p1.put_card_on_stack()
-		deck.show()
-		p1.show()
-	elif key == 't':
-		p1.toggle_possible_cards()
-		deck.show()
-		p1.show()
-	else:
-		p1.get_card_from_blind()
-		deck.show()
-		p1.show()
 	
+	if key == '1':
+		deck.show()
+		p0.show()
+	if key == '2':
+		deck.show()
+		p1.show()
+
+	if key == 's':
+		p0.put_card_on_stack()
+		deck.show()
+		p0.show()
+	if key == 't':
+		p0.toggle_possible_cards()
+		deck.show()
+		p0.show()
+	if key == 'b':
+		p0.get_card_from_blind()
+		deck.show()
+		p0.show()
+
