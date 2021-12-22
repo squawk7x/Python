@@ -17,7 +17,7 @@ class Card:
 		return '{} {}'.format(self.suit, self.rank)
 	
 	def __eq__(self, other):
-		if self.rank == other.rank or self.suit == other.suit:  # or self.rank == 'J':
+		if self.suit == other.suit and self.rank == other.rank:
 			return True
 		else:
 			return False
@@ -41,10 +41,8 @@ class Card:
 
 # card = Card()
 
-
 class Deck:
-	''' Represents a full card deck
-	with a closed deck and an open stack '''
+	''' Represents a card deck with a blind and a stack '''
 	
 	def __init__(self):
 		self.blind = []
@@ -54,20 +52,22 @@ class Deck:
 			for rank in ranks:
 				self.blind.append(Card(suit, rank))
 	
-	def show(self):
-		self.show_blind()
-		self.show_stack()
-	
 	# self.shuffle_blind()
 	
 	''' deck methods '''
 	
-	def shuffle_blind(self):
-		random.shuffle(self.blind)
+	def show(self):
+		self.show_blind()
+		self.show_stack()
+	
+	''' blind methods '''
 	
 	def show_blind(self):
 		print(f'Blind ({len(self.blind)}) card(s):')
 		print([str(card) for card in self.blind])
+	
+	def shuffle_blind(self):
+		random.shuffle(self.blind)
 	
 	def draw_card_from_blind(self):
 		if not self.blind:
@@ -75,20 +75,21 @@ class Deck:
 			self.stack = []
 			self.stack.append(self.blind.pop())
 		# random.shuffle(self.blind)
-		if self.blind:
+		if self.blind:  # this 'if' statement could be omitted
 			return self.blind.pop()  # there was more than 1 card on stack
 	
 	''' stack methods '''
-	
-	def put_card_on_stack(self, card):
-		self.stack.append(card)
 	
 	def show_stack(self):
 		print(f'Stack ({len(self.stack)}) card(s):')
 		print([str(card) for card in self.stack])
 	
+	def put_card_on_stack(self, card):
+		self.stack.append(card)
+	
 	def get_top_card_from_stack(self):
-		return self.stack[-1]
+		if self.stack:  # this 'if' statement could be omitted
+			return self.stack[-1]
 
 
 deck = Deck()
@@ -101,24 +102,34 @@ class Handdeck:
 		self.cards = []
 		self.possible_cards = []
 	
+	def __len__(self):
+		return len(self.cards)
+	
 	def count_points(self):
 		points = 0
 		for card in self.cards:
 			points += card.value
 		return points
-
-	def remove_card(self, card: Card):
-		for c in self.cards:
-			if c.suit == card.suit and c.rank == card.rank:
-				self.cards.remove(card)
+	
+	def remove_card_from_cards(self, c: Card):
+		if self.cards:
+			for card in self.cards:
+				if card.suit == c.suit and card.rank == c.rank:
+					self.cards.remove(card)
+	
+	def remove_card_from_possible_cards(self, c: Card):
+		if self.possible_cards:
+			for card in self.possible_cards:
+				if card.suit == c.suit and card.rank == c.rank:
+					self.possible_cards.remove(card)
 	
 	def get_possible_cards(self):
 		self.possible_cards = []
 		for card in self.cards:
-			if card.__eq__(deck.get_top_card_from_stack()):
-					self.possible_cards.append(card)
+			if card.suit == deck.get_top_card_from_stack().suit or card.rank == deck.get_top_card_from_stack().rank or card.rank == 'J':
+				self.possible_cards.append(card)
 		return self.possible_cards
-	
+
 
 class Player:
 	''' Represents a player with cards in hand '''
@@ -128,24 +139,17 @@ class Player:
 		self.hand = Handdeck()
 		
 		for _ in range(5):
-			self.get_card_from_blind()
+			self.hand.cards.append(deck.blind.pop())
 		
 		''' open first card on stack '''
 		if not deck.stack:
 			deck.stack.append(self.hand.cards.pop())
+		
+		self.hand.possible_cards = self.hand.get_possible_cards()
 	
 	def show(self):
 		self.show_hand()
 		self.show_possible_cards()
-	
-	def get_card_from_blind(self):
-		self.hand.cards.append(deck.draw_card_from_blind())
-	
-	def put_card_on_stack(self):
-		if self.hand.possible_cards:
-			deck.put_card_on_stack(self.hand.possible_cards.pop())
-			'''' TODO '''
-			self.hand.remove_card(deck.get_top_card_from_stack())
 	
 	def show_hand(self):
 		print(f'{self.name} holds ({len(self.hand.cards)}) card(s):')
@@ -158,21 +162,32 @@ class Player:
 		      f'[{str(deck.get_top_card_from_stack())}]')
 	
 	def toggle_possible_cards(self):
-		# self.hand.possible_cards = self.hand.get_possible_cards()
 		if self.hand.possible_cards:
-			self.hand.possible_cards.insert(0, self.hand.possible_cards.pop())
-		print([str(card) for card in self.hand.cards])
-		print([str(card) for card in self.hand.possible_cards])
-		
+			card = self.hand.possible_cards.pop()
+			self.hand.cards.remove(card)
+			self.hand.cards.insert(0, card)
+			self.hand.possible_cards.insert(0, card)
+	
+	def get_card_from_blind(self):
+		self.hand.cards.append(deck.draw_card_from_blind())
+		self.hand.get_possible_cards()
+	
+	def put_card_on_stack(self):
+		if self.hand.possible_cards:
+			card = self.hand.possible_cards.pop()
+			self.hand.cards.remove(card)
+			deck.put_card_on_stack(card)
 
-deck.show()
+
 p1 = Player('Player 1')
 deck.show()
 p1.show()
 
 while True:
 	key = input('s -> card to Stack | b -> card from Blind: | (q)uit')
-	if key == 's':
+	if key == 'q':
+		break
+	elif key == 's':
 		p1.put_card_on_stack()
 		deck.show()
 		p1.show()
@@ -180,11 +195,8 @@ while True:
 		p1.toggle_possible_cards()
 		deck.show()
 		p1.show()
-	
-	elif key == 'q':
-		
-		break
 	else:
 		p1.get_card_from_blind()
 		deck.show()
 		p1.show()
+	
