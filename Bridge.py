@@ -2,7 +2,7 @@ import random
 
 suits = ['\u2666', '\u2665', '\u2660', '\u2663']
 ranks = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-suit_color = ['\033[95m', '\033[91m', '\033[93m', '\033[94m']
+suit_colors = ['\033[95m', '\033[91m', '\033[93m', '\033[94m']
 reset_color = '\033[0m'
 
 
@@ -18,13 +18,13 @@ class Card:
 	def __str__(self):
 		
 		if self.suit == '\u2666':
-			card = f'{suit_color[0]}{self.suit}{self.rank}{reset_color} '
+			card = f'{suit_colors[0]}{self.suit}{self.rank}{reset_color} '
 		elif self.suit == '\u2665':
-			card = f'{suit_color[1]}{self.suit}{self.rank}{reset_color} '
+			card = f'{suit_colors[1]}{self.suit}{self.rank}{reset_color} '
 		elif self.suit == '\u2660':
-			card = f'{suit_color[2]}{self.suit}{self.rank}{reset_color} '
+			card = f'{suit_colors[2]}{self.suit}{self.rank}{reset_color} '
 		elif self.suit == '\u2663':
-			card = f'{suit_color[3]}{self.suit}{self.rank}{reset_color} '
+			card = f'{suit_colors[3]}{self.suit}{self.rank}{reset_color} '
 		
 		return card
 	
@@ -34,7 +34,7 @@ class Card:
 		else:
 			return False
 	
-	def get_suite(self):
+	def get_suit(self):
 		return self.suit
 	
 	def get_rank(self):
@@ -49,6 +49,65 @@ class Card:
 	
 	def get_value(self):
 		return self.value
+
+
+class Jsuit:
+	
+	def __init__(self, suit, color):
+		self.suit = suit
+		self.color = color
+	
+	def __str__(self):
+		
+		sign = f'{self.color}{2 * self.suit}{reset_color} '
+		
+		return sign
+	
+	def __eq__(self, other):
+		if self.suit == other.suit:
+			return True
+		else:
+			return False
+	
+	def get_suit(self):
+		return self.suit
+
+
+class Jchoice:
+	js = []
+	j = None
+	
+	def __init__(self):
+		self.js = [Jsuit('\u2666', '\033[95m'), Jsuit('\u2665', '\033[91m'), Jsuit('\u2660', '\033[93m'),
+		           Jsuit('\u2663', '\033[94m')]
+	
+	def toggle_js(self):
+		self.js.insert(0, self.js.pop())
+	
+	def set_j(self):
+		self.j = self.js[-1]
+	
+	def clear_j(self):
+		self.j = None
+	
+	def get_j(self):
+		if self.j:
+			return self.j
+		else:
+			return ''
+	
+	def get_j_suit(self):
+		if self.j:
+			return self.j.suit
+	
+	def show_js(self):
+		js = ''
+		for j in self.js:
+			js += str(j)
+		print(js)
+
+
+jchoice = Jchoice()
 
 
 class Deck:
@@ -93,8 +152,8 @@ class Deck:
 			self.stack = []
 			self.stack.append(self.blind.pop())
 		# random.shuffle(self.blind)
-		if self.blind:  # this 'if' statement could be omitted
-			return self.blind.pop()  # there was more than 1 card on stack
+		if self.blind:
+			return self.blind.pop()
 	
 	''' stack methods '''
 	
@@ -104,17 +163,16 @@ class Deck:
 		stack = ''
 		for card in self.stack:
 			stack += str(card)
-		print(stack)
-		
-		'''
-		print(f'{str(self.stack[-1])}{(len(self.stack) - 1) * '#'}')
-		'''
+		print(f'{stack}{jchoice.get_j()}')
 	
 	def put_card_on_stack(self, card):
 		self.stack.append(card)
+		
+		if card.rank == 'J':
+			pass
 	
 	def get_top_card_from_stack(self):
-		if self.stack:  # this 'if' statement could be omitted
+		if self.stack:
 			return self.stack[-1]
 
 
@@ -149,15 +207,31 @@ class Handdeck:
 				if card.suit == c.suit and card.rank == c.rank:
 					self.possible_cards.remove(card)
 	
-	def get_possible_cards(self, cards_played=False):
+	def get_possible_cards(self, yet_set: bool):
+		
 		self.possible_cards = []
-		for card in self.cards:
-			if deck.get_top_card_from_stack():  # cards on deck not empty
-				if not cards_played:
-					if card.suit == deck.get_top_card_from_stack().suit or card.rank == deck.get_top_card_from_stack().rank or card.rank == 'J':
+		stack_card = deck.get_top_card_from_stack()
+		
+		if not yet_set:
+			if stack_card.rank == 'J':
+				for card in self.cards:
+					if card.suit == jchoice.get_j_suit() or card.rank == 'J':
 						self.possible_cards.append(card)
-				else:
-					if card.rank == deck.get_top_card_from_stack().rank or card.rank == 'J':
+			
+			else:
+				for card in self.cards:
+					if card.rank == stack_card.rank or card.suit == stack_card.suit or card.rank == 'J':
+						self.possible_cards.append(card)
+		
+		if yet_set:
+			if stack_card.rank == '6':
+				for card in self.cards:
+					if card.rank == stack_card.rank or card.suit == stack_card.suit or card.rank == 'J':
+						self.possible_cards.append(card)
+			
+			else:
+				for card in self.cards:
+					if card.rank == stack_card.rank:
 						self.possible_cards.append(card)
 		
 		return self.possible_cards
@@ -167,6 +241,7 @@ class Player:
 	''' Represents a player with cards in hand '''
 	name = None
 	hand = None
+	cards_drawn = []
 	cards_played = []
 	
 	def __init__(self, name=None):
@@ -174,7 +249,10 @@ class Player:
 		self.hand = Handdeck()
 		
 		for _ in range(5):
-			self.hand.cards.append(deck.blind.pop())
+			card = deck.blind.pop()
+			self.hand.cards.append(card)
+			self.cards_drawn.append(card)
+			
 		
 		''' open first card on stack '''
 		if not deck.stack:
@@ -194,7 +272,7 @@ class Player:
 	
 	def show_possible_cards(self):
 		cards = ''
-		self.hand.possible_cards = self.hand.get_possible_cards(self.cards_played)
+		self.hand.possible_cards = self.hand.get_possible_cards(bool(self.cards_played))
 		for card in self.hand.possible_cards:
 			cards += str(card)
 		print(f'{self.name} can play ({len(self.hand.possible_cards)}) card(s):')
@@ -208,8 +286,12 @@ class Player:
 			self.hand.possible_cards.insert(0, card)
 	
 	def get_card_from_blind(self):
-		self.hand.cards.append(deck.draw_card_from_blind())
-		self.hand.get_possible_cards()
+		if deck.blind and not self.cards_played and not self.cards_drawn\
+				and not self.hand.get_possible_cards(self.cards_played):
+			card = deck.draw_card_from_blind()
+			self.hand.cards.append(card)
+			self.cards_drawn.append(card)
+			self.hand.get_possible_cards(bool(self.cards_played))
 	
 	def put_card_on_stack(self):
 		if self.hand.possible_cards:
@@ -217,7 +299,8 @@ class Player:
 			self.hand.cards.remove(card)
 			deck.put_card_on_stack(card)
 			self.cards_played.append(card)
-			self.turn_completed = bool(self.cards_played)
+			self.hand.possible_cards = self.hand.get_possible_cards(bool(self.cards_played))
+			jchoice.clear_j()
 
 
 class Game:
@@ -234,13 +317,15 @@ class Game:
 			self.player_list.append(Player(f'Player-{player + 1}'))
 		
 		self.player = self.player_list[0]
-		self.turn_completed = (deck.get_top_card_from_stack().rank != '6')
+	
+	# self.turn_completed = (deck.get_top_card_from_stack().rank != '6')
 	
 	def activate_next_player(self):
 		self.cards_for_evaluation = self.player.cards_played
 		self.player.cards_played = []  # preparation for next turn
 		self.player_list.append(self.player_list.pop(0))  # get actual player to the end of playerlist
 		self.player = self.player_list[0]  # next player now on position 0
+		self.player.cards_drawn = []
 	
 	def evaluate(self):
 		leaps = 0
@@ -259,13 +344,14 @@ class Game:
 				leaps += 1
 			if card.rank == 'J':
 				pass
+			
+			self.cards_for_evaluation.remove(card)
 		
 		for _ in range(leaps):
 			self.activate_next_player()
+
 		
-		self.cards_for_evaluation.remove(card)
-		
-		return leaps
+		return None
 	
 	def play(self):
 		
@@ -274,7 +360,7 @@ class Game:
 		
 		while True:
 			
-			key = input('a: toggle | s: put | x: draw | (q)uit')
+			key = input('a: toggle | s: put | x: draw | space: next Player | (q)uit game')
 			
 			if key == 'q':
 				break
@@ -286,7 +372,26 @@ class Game:
 				self.player.get_card_from_blind()
 			
 			if key == ' ':
-				if self.player.cards_played and (deck.get_top_card_from_stack().rank != '6'):
+				
+				if self.player.cards_played and (deck.get_top_card_from_stack().rank == 'J'):
+					
+					jchoice.show_js()
+					
+					while True:
+						key = input('a: toggle color | space: set color')
+						
+						if key == 'a' or key == ' ':
+							jchoice.toggle_js()
+							jchoice.show_js()
+						if key == ' ':
+							jchoice.set_j()
+							break
+					
+					self.activate_next_player()
+					self.evaluate()
+				
+				
+				elif self.player.cards_played and (deck.get_top_card_from_stack().rank != '6'):
 					self.activate_next_player()
 					self.evaluate()
 			
