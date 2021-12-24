@@ -59,7 +59,7 @@ class Jsuit:
 	
 	def __str__(self):
 		
-		sign = f'{self.color}{2 * self.suit}{reset_color} '
+		sign = f'{self.color}{self.suit}{self.suit}{reset_color} '
 		
 		return sign
 	
@@ -122,7 +122,7 @@ class Deck:
 			for rank in ranks:
 				self.blind.append(Card(suit, rank))
 	
-	# self.shuffle_blind()
+		self.shuffle_blind()
 	
 	''' deck methods '''
 	
@@ -153,7 +153,7 @@ class Deck:
 			self.stack = []
 			self.stack.append(self.blind.pop())
 			self.shufflings += 1
-		# random.shuffle(self.blind)
+		random.shuffle(self.blind)
 		if self.blind:
 			return self.blind.pop()
 	
@@ -226,7 +226,7 @@ class Handdeck:
 				for card in self.cards:
 					if card.rank == stack_card.rank or card.suit == stack_card.suit or card.rank == 'J':
 						self.possible_cards.append(card)
-			
+		
 		if yet_set:
 			for card in self.cards:
 				if card.rank == stack_card.rank:
@@ -252,7 +252,6 @@ class Player:
 		for _ in range(5):
 			card = deck.blind.pop()
 			self.hand.cards.append(card)
-			self.hand.cards_drawn.append(card)
 		
 		''' open first card on stack '''
 		if not deck.stack:
@@ -267,17 +266,16 @@ class Player:
 		cards = ''
 		for card in self.hand.cards:
 			cards += str(card)
-		print(f'{self.name} holds ({len(self.hand.cards)}) card(s) with [{self.hand.count_points()} points]:')
+		print(f'{self.name} holds ({len(self.hand.cards)}) card(s) [{self.hand.count_points()} points]:')
 		print(cards)
-		print(f'cards_played: {self.hand.cards_played}')
-		print(f'cards_drawn: {self.hand.cards_drawn}')
 	
 	def show_possible_cards(self):
 		cards = ''
 		self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played))
 		for card in self.hand.possible_cards:
 			cards += str(card)
-		print(f'{self.name} can play ({len(self.hand.possible_cards)}) card(s):')
+		print(f'{self.name} has played ({len(self.hand.cards_played)}) / drawn ({len(self.hand.cards_drawn)}) card(s)'
+		      f' and can play ({len(self.hand.possible_cards)}) card(s):')
 		print(cards)
 	
 	def toggle_possible_cards(self):
@@ -289,15 +287,13 @@ class Player:
 	
 	def get_card_from_blind(self):
 		
-		self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played or self.hand.cards_drawn))
+		#self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played or self.hand.cards_drawn))
 		
-		if deck.blind and not self.hand.cards_played and not self.hand.cards_drawn \
-				and not self.hand.possible_cards:
+		if deck.blind:# and not self.hand.cards_played and not self.hand.cards_drawn and not self.hand.possible_cards:
 			card = deck.draw_card_from_blind()
 			self.hand.cards.append(card)
 			self.hand.cards_drawn.append(card)
-			self.hand.get_possible_cards(bool(self.hand.cards_played))
-			
+			#self.hand.get_possible_cards(bool(self.hand.cards_played))
 	
 	def put_card_on_stack(self):
 		if self.hand.possible_cards:
@@ -305,7 +301,7 @@ class Player:
 			self.hand.cards.remove(card)
 			deck.put_card_on_stack(card)
 			self.hand.cards_played.append(card)
-			self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played))
+			#self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played))
 			jchoice.clear_j()
 
 
@@ -317,7 +313,18 @@ class Game:
 	scores = {}
 	
 	def __init__(self):
-		self.number_of_players = int(input(f'How many players?'))
+		
+		while True:
+			
+			try:
+				self.number_of_players = int(input(f'How many players (2-4)? '))
+			except ValueError:
+				print('Valid number, please')
+				continue
+			if 1 <= self.number_of_players <= 4:
+				break
+			else:
+				print('Please enter value between 1 and 4')
 		
 		for player in range(self.number_of_players):
 			self.player_list.append(Player(f'Player-{player + 1}'))
@@ -373,6 +380,7 @@ class Game:
 		self.player.show()
 		
 		while self.player.hand.cards:
+			
 			key = input('a: toggle | s: put | x: draw | space: next Player | o: scores | (q)uit game')
 			
 			if key == 'q':
@@ -384,35 +392,68 @@ class Game:
 			if key == 's':
 				self.player.put_card_on_stack()
 			if key == 'x':
-				self.player.get_card_from_blind()
+				if self.player.hand.possible_cards:
+					pass
+				elif not self.player.hand.possible_cards and (self.player.hand.cards_played or self.player.hand.cards_drawn):
+					pass
+				elif deck.get_top_card_from_stack().rank == '6' and not self.player.hand.possible_cards:
+					self.player.get_card_from_blind()
+				else:
+					pass
+				
 			if key == ' ':
-				if not self.player.hand.get_possible_cards(bool(self.player.hand.cards_drawn)) \
-						and self.player.hand.cards_drawn:
-					self.activate_next_player()
-					self.evaluate()
 				
-				elif self.player.hand.cards_played and (deck.get_top_card_from_stack().rank == 'J'):
-					jchoice.show_js()
-					while True:
-						key = input('a: toggle color | space: set color')
-						if key == 'a' or key == 'd':
-							jchoice.toggle_js()
-							jchoice.show_js()
-						if key == 's':
-							jchoice.set_j()
-							break
-					self.activate_next_player()
-					self.evaluate()
+				'''
+				played   possible drawn
+					1       1       1       Y
+					1       1       0       Y
+					1       0       1       Y
+					1       0       0       Y
+					0       1       1       N
+					0       1       0       N
+					0       0       1       Y
+					0       0       0       N
+				'''
 				
-				elif self.player.hand.cards_played and (deck.get_top_card_from_stack().rank != '6'):
+				if self.player.hand.cards_played:
 					
-					self.activate_next_player()
-					self.evaluate()
+					if deck.get_top_card_from_stack().rank == '6':
+						pass
+					
+					elif deck.get_top_card_from_stack().rank == 'J':
+						jchoice.show_js()
+						while True:
+							key = input('a: toggle color | space: set color')
+							if key == 'a' or key == 'd':
+								jchoice.toggle_js()
+								jchoice.show_js()
+							if key == 's':
+								jchoice.set_j()
+								break
+						self.activate_next_player()
+						self.evaluate()
+				
+					else:
+						self.activate_next_player()
+						self.evaluate()
+				
+				if not self.player.hand.cards_played:
+					
+					if self.player.hand.possible_cards:
+						pass
+					
+					elif not self.player.hand.possible_cards and self.player.hand.cards_drawn:
+						self.activate_next_player()
+						self.evaluate()
+					
+					elif not self.player.hand.possible_cards and not self.player.hand.cards_drawn:
+						pass
 			
 			deck.show()
 			self.player.show()
 		
 		self.show_scores()
+
 
 game = Game()
 game.play()
