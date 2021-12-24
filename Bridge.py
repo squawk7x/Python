@@ -389,6 +389,8 @@ class Game:
 					
 					self.activate_next_player()
 					self.evaluate()
+					
+					
 				
 				
 				elif self.player.cards_played and (deck.get_top_card_from_stack().rank != '6'):
