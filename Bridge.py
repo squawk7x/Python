@@ -211,12 +211,36 @@ class Handdeck:
 				if card.suit == c.suit and card.rank == c.rank:
 					self.possible_cards.remove(card)
 	
-	def get_possible_cards(self, yet_set: bool):
+	def get_possible_cards(self):
 		
 		self.possible_cards = []
 		stack_card = deck.get_top_card_from_stack()
 		
-		if not yet_set:
+		'''
+		1st move:
+		---------
+		suit    rank    J
+		
+		stack_card = '6'
+		suit    rank    J
+		
+		stack_card = 'J'
+		suit            J
+		
+		2nd move:
+		---------
+				rank
+		
+		stack_card = '6'
+		suit    rank    J
+		
+		stack_card 'J':
+		suit            J
+		
+		'''
+		
+		if not self.cards_played:
+			
 			if stack_card.rank == 'J':
 				for card in self.cards:
 					if card.suit == jchoice.get_j_suit() or card.rank == 'J':
@@ -227,15 +251,21 @@ class Handdeck:
 					if card.rank == stack_card.rank or card.suit == stack_card.suit or card.rank == 'J':
 						self.possible_cards.append(card)
 		
-		if yet_set:
-			for card in self.cards:
-				if card.rank == stack_card.rank:
-					self.possible_cards.append(card)
-		
-		if stack_card.rank == '6':
-			for card in self.cards:
-				if card.rank == stack_card.rank or card.suit == stack_card.suit or card.rank == 'J':
-					self.possible_cards.append(card)
+		if self.cards_played:
+			if stack_card.rank == '6':
+				for card in self.cards:
+					if card.rank == stack_card.rank or card.suit == stack_card.suit or card.rank == 'J':
+						self.possible_cards.append(card)
+				
+			elif stack_card.rank == 'J':
+				for card in self.cards:
+					if card.suit == jchoice.get_j_suit() or card.rank == 'J':
+						self.possible_cards.append(card)
+			
+			else:
+				for card in self.cards:
+					if card.rank == stack_card.rank:
+						self.possible_cards.append(card)
 		
 		return self.possible_cards
 
@@ -271,7 +301,7 @@ class Player:
 	
 	def show_possible_cards(self):
 		cards = ''
-		self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played))
+		self.hand.possible_cards = self.hand.get_possible_cards()
 		for card in self.hand.possible_cards:
 			cards += str(card)
 		print(f'{self.name} has played ({len(self.hand.cards_played)}) / drawn ({len(self.hand.cards_drawn)}) card(s)'
@@ -286,14 +316,10 @@ class Player:
 			self.hand.possible_cards.insert(0, card)
 	
 	def get_card_from_blind(self):
-		
-		#self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played or self.hand.cards_drawn))
-		
-		if deck.blind:# and not self.hand.cards_played and not self.hand.cards_drawn and not self.hand.possible_cards:
+		if deck.blind:
 			card = deck.draw_card_from_blind()
 			self.hand.cards.append(card)
 			self.hand.cards_drawn.append(card)
-			#self.hand.get_possible_cards(bool(self.hand.cards_played))
 	
 	def put_card_on_stack(self):
 		if self.hand.possible_cards:
@@ -301,7 +327,6 @@ class Player:
 			self.hand.cards.remove(card)
 			deck.put_card_on_stack(card)
 			self.hand.cards_played.append(card)
-			#self.hand.possible_cards = self.hand.get_possible_cards(bool(self.hand.cards_played))
 			jchoice.clear_j()
 
 
@@ -365,10 +390,8 @@ class Game:
 	
 	def show_scores(self):
 		if not self.player.hand.cards:
-			print(f'The winner of this round is: {self.player.name}')
-		
-		print('Scores:')
-		
+			print(f'The winner of this round is {self.player.name}')
+		print('')
 		for player in self.scores.keys():
 			self.scores[player] += player.hand.count_points()  # * deck.shufflings
 			if self.scores[player] == 125:
@@ -392,19 +415,45 @@ class Game:
 			if key == 's':
 				self.player.put_card_on_stack()
 			if key == 'x':
-				if self.player.hand.possible_cards:
-					pass
-				elif not self.player.hand.possible_cards and (self.player.hand.cards_played or self.player.hand.cards_drawn):
-					pass
-				elif deck.get_top_card_from_stack().rank == '6' and not self.player.hand.possible_cards:
+				'''
+				pull card possible, (not '6' on stack) if:
+				------------------------------------------
+				
+				 card   possible  card
+				played    cards   drawn
+					1       1       1       N
+					1       1       0       N
+					1       0       1       N
+					1       0       0       N
+					0       1       1       N
+					0       1       0       N
+					0       0       1       N
+					0       0       0       Y
+					
+				'6' on stack:
+				-------------
+							1               Y
+				
+				'''
+				
+				stack_card = deck.get_top_card_from_stack()
+				
+				if stack_card.rank == '6' and not self.player.hand.possible_cards:
 					self.player.get_card_from_blind()
+				
+				elif not self.player.hand.cards_played and not self.player.hand.possible_cards and not self.player.hand.cards_drawn:
+					self.player.get_card_from_blind()
+					
 				else:
 					pass
 				
 			if key == ' ':
 				
 				'''
-				played   possible drawn
+				next player possible, (no 6 on stack) if:
+				
+				 card   possible  card    next
+				played    cards   drawn   player
 					1       1       1       Y
 					1       1       0       Y
 					1       0       1       Y
