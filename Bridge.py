@@ -113,9 +113,11 @@ jchoice = Jchoice()
 class Deck:
 	''' Represents a card deck with a blind and a stack '''
 	
+
 	def __init__(self):
 		self.blind = []
 		self.stack = []
+		self.bridge = []
 		self.shufflings = 1
 		
 		for suit in suits:
@@ -128,16 +130,16 @@ class Deck:
 	
 	def show(self):
 		self.show_blind()
+		self.show_bridge_monitor()
 		self.show_stack()
 	
 	''' blind methods '''
 	
 	def show_blind(self):
 		blind = ''
-		print(f'Blind ({len(self.blind)}) card(s):')
-		
 		for card in self.blind:
 			blind += str(card)
+		print(f'Blind ({len(self.blind)}) card(s):')
 		print(blind)
 		
 		'''
@@ -146,7 +148,7 @@ class Deck:
 	
 	def shuffle_blind(self):
 		random.shuffle(self.blind)
-	
+		
 	def draw_card_from_blind(self):
 		if not self.blind:
 			self.blind = self.stack
@@ -160,24 +162,38 @@ class Deck:
 	''' stack methods '''
 	
 	def show_stack(self):
-		
-		print(f'Stack ({len(self.stack)}) card(s):')
 		stack = ''
 		for card in self.stack:
 			stack += str(card)
+		print(f'Stack ({len(self.stack)}) card(s):')
 		print(f'{stack}{jchoice.get_j()}')
 	
 	def put_card_on_stack(self, card):
 		self.stack.append(card)
-		
-		if card.rank == 'J':
-			pass
 	
 	def get_top_card_from_stack(self):
 		if self.stack:
 			return self.stack[-1]
 
-
+	''' bridge monitor '''
+	
+	def check_is_bridge(self, card: Card):
+		
+		if card.rank != deck.bridge[0].rank:
+			deck.bridge.clear()
+		deck.bridge.append(card)
+		if len(deck.bridge) == 4:
+			return True
+		else:
+			return False
+		
+	def show_bridge_monitor(self):
+		bridge = ''
+		for card in self.bridge:
+			bridge += str(card)
+		print(f'Bridge monitor ({len(self.bridge)}) card(s):')
+		print(f'{bridge}')
+		
 deck = Deck()
 
 
@@ -279,18 +295,31 @@ class Player:
 		self.name = name
 		self.hand = Handdeck()
 		
+		''' draw the initial 5 cards'''
+		self.draw_5_cards()
+	
+		''' open first card on stack Player 0'''
+		self.put_initial_card()
+	
+	def draw_5_cards(self):
+		self.hand.cards = []
+		self.hand.cards_played = []
+		self.hand.cards_drawn = []
+		
 		for _ in range(5):
 			card = deck.blind.pop()
 			self.hand.cards.append(card)
-		
-		''' open first card on stack '''
+			
+	def put_initial_card(self):
 		if not deck.stack:
-			deck.stack.append(self.hand.cards.pop())
-			self.hand.cards_played.append(deck.get_top_card_from_stack())
-	
+			card = self.hand.cards.pop()
+			deck.put_card_on_stack(card)
+			self.hand.cards_played.append(card)
+			deck.bridge.append(card)
+			
 	def show(self):
-		self.show_hand()
 		self.show_possible_cards()
+		self.show_hand()
 	
 	def show_hand(self):
 		cards = ''
@@ -327,6 +356,7 @@ class Player:
 			self.hand.cards.remove(card)
 			deck.put_card_on_stack(card)
 			self.hand.cards_played.append(card)
+			deck.check_is_bridge(card)
 			jchoice.clear_j()
 
 
@@ -351,13 +381,29 @@ class Game:
 			else:
 				print('Please enter value between 1 and 4')
 		
-		for player in range(self.number_of_players):
-			self.player_list.append(Player(f'Player-{player + 1}'))
+		self.new_round()
 		
+	def new_round(self, shuffler=0):
+		
+		global deck
+		
+		deck = Deck()
+		deck.shuffle_blind()
+		
+		if not self.player_list or len(self.player_list) != self.number_of_players:
+			for player in range(self.number_of_players):
+				self.player_list.append(Player(f'Player-{player + 1}'))
+		
+		if not self.scores:
+			for player in self.player_list:
+				self.scores[player] = 0
+				
 		for player in self.player_list:
-			self.scores[player] = 0
+			player.draw_5_cards()
 		
-		self.player = self.player_list[0]
+		self.player = self.player_list[shuffler]
+		self.player.put_initial_card()
+
 	
 	def activate_next_player(self):
 		self.cards_for_evaluation = self.player.hand.cards_played
@@ -388,33 +434,49 @@ class Game:
 			self.activate_next_player()
 		return None
 	
-	def show_scores(self):
+		
+	def show_scores(self, bridge=False):
+		if bridge:
+			self.activate_next_player()
+			self.evaluate()
+		
 		if not self.player.hand.cards:
 			print(f'The winner of this round is {self.player.name}')
-		print('')
+			print('')
+			
 		for player in self.scores.keys():
 			self.scores[player] += player.hand.count_points()  # * deck.shufflings
 			if self.scores[player] == 125:
 				self.scores[player] = 0
 			print(player.name, " --> ", self.scores[player])
+		#print(f'The new shuffler for next round is {self.player.name}')  # TODO
 	
 	def play(self):
+		self.new_round(shuffler=0)
 		deck.show()
 		self.player.show()
 		
 		while self.player.hand.cards:
 			
-			key = input('a: toggle | s: put | x: draw | space: next Player | o: scores | (q)uit game')
+			key = input('a: toggle | s: put | x: draw | space: next Player | o: scores | r: new round | (q)uit game')
 			
+			if key == '8':
+				for suit in suits:
+					self.player.hand.cards.append(Card(suit, '8'))
 			if key == 'q':
 				break
+			if key == 'r':
+				deck.bridge = []
+				self.new_round(shuffler=1)
 			if key == 'o':
 				self.show_scores()
 			if key == 'a' or key == 'd':
 				self.player.toggle_possible_cards()
 			if key == 's':
 				self.player.put_card_on_stack()
+		
 			if key == 'x':
+				
 				'''
 				pull card possible, (not '6' on stack) if:
 				------------------------------------------
