@@ -1,4 +1,7 @@
 import random
+import keyboard
+
+
 
 suits = ['\u2666', '\u2665', '\u2660', '\u2663']
 ranks = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
@@ -362,7 +365,7 @@ class Player:
 
 class Game:
 	player = None
-	number_of_players = 0
+	number_of_players = 3
 	player_list = []
 	cards_for_evaluation = []
 	scores = {}
@@ -372,7 +375,8 @@ class Game:
 		while True:
 			
 			try:
-				self.number_of_players = int(input(f'How many players (2-4)? '))
+				print("Enter number of players:")
+				self.number_of_players = int(keyboard.read_key())
 			except ValueError:
 				print('Valid number, please')
 				continue
@@ -380,6 +384,7 @@ class Game:
 				break
 			else:
 				print('Please enter value between 1 and 4')
+		
 		
 		self.new_round()
 		
@@ -449,7 +454,8 @@ class Game:
 			if self.scores[player] == 125:
 				self.scores[player] = 0
 			print(player.name, " --> ", self.scores[player])
-		#print(f'The new shuffler for next round is {self.player.name}')  # TODO
+		looser = sorted(self.scores.items(), key=lambda kv: (kv[1], kv[0])).pop()
+		print(f'The new shuffler for next round is {looser[0].name}')
 	
 	def play(self):
 		self.new_round(shuffler=0)
@@ -458,24 +464,24 @@ class Game:
 		
 		while self.player.hand.cards:
 			
-			key = input('a: toggle | s: put | x: draw | space: next Player | o: scores | r: new round | (q)uit game')
+			print('a: toggle | s: put | x: draw | space: next Player | o: scores | r: new round | (q)uit game')
 			
-			if key == '8':
+			if keyboard.read_key() == '8':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, '8'))
-			if key == 'q':
+			if keyboard.read_key() == 'q':
 				break
-			if key == 'r':
+			if keyboard.read_key() == 'r':
 				deck.bridge = []
 				self.new_round(shuffler=1)
-			if key == 'o':
+			if keyboard.read_key() == 'o':
 				self.show_scores()
-			if key == 'a' or key == 'd':
+			if keyboard.read_key() == 'a':
 				self.player.toggle_possible_cards()
-			if key == 's':
+			if keyboard.read_key() == 's':
 				self.player.put_card_on_stack()
 		
-			if key == 'x':
+			if keyboard.read_key() == 'x':
 				
 				'''
 				pull card possible, (not '6' on stack) if:
@@ -509,7 +515,7 @@ class Game:
 				else:
 					pass
 				
-			if key == ' ':
+			if keyboard.read_key() == 'space':
 				
 				'''
 				next player possible, (no 6 on stack) if:
@@ -534,11 +540,11 @@ class Game:
 					elif deck.get_top_card_from_stack().rank == 'J':
 						jchoice.show_js()
 						while True:
-							key = input('a: toggle color | space: set color')
-							if key == 'a' or key == 'd':
+							print('a: toggle color | space: set color')
+							if keyboard.read_key() == 'a':
 								jchoice.toggle_js()
 								jchoice.show_js()
-							if key == 's':
+							if keyboard.read_key() == 's':
 								jchoice.set_j()
 								break
 						self.activate_next_player()
