@@ -1,5 +1,12 @@
-import random
+'''
+TODO:
+blind refill
+bridge
+round -125
 
+'''
+
+import random
 import keyboard
 
 suits = ['\u2666', '\u2665', '\u2660', '\u2663']
@@ -141,16 +148,12 @@ class Deck:
 	def show_blind(self):
 		blind = ''
 		for card in self.blind:
-			# blind += str(card)
-			blind += '## '
+			 blind += str(card)
+			#blind += '## '
 		blind += '\n'
 		print(f'{20 * " "}Blind ({len(self.blind)}) card(s):')
 		print(f'{20 * " "}{blind}')
 		
-		'''
-		print(len(self.blind) * '# ')
-		'''
-	
 	def shuffle_blind(self):
 		random.shuffle(self.blind)
 	
@@ -334,8 +337,7 @@ class Player:
 		self.hand.cards_drawn = []
 		
 		for _ in range(5):
-			card = deck.blind.pop()
-			self.hand.cards.append(card)
+			self.hand.cards.append(deck.blind.pop())
 	
 	def put_initial_card(self):
 		if not deck.stack:
@@ -392,7 +394,7 @@ class Player:
 class Bridge:
 	'''
 	
-	Playing Rules:
+	Rules Of The Game
 	--------------
 	Bridge is played with 36 cards (4 suits and ranks from 6 to Ace) by 2-4 players.
 	Each player starts with 5 cards from blind. First player puts a card onto the stack
@@ -448,8 +450,8 @@ class Bridge:
 		while True:
 			
 			try:
-				# print("Enter number of players:")
-				# self.number_of_players = int(keyboard.read_hotkey(False))
+				print("Enter number of players:")
+				self.number_of_players = int(keyboard.read_hotkey(False))
 				self.number_of_players = 3
 			except ValueError:
 				print('Valid number, please')
@@ -503,8 +505,7 @@ class Bridge:
 				leaps_for_eight = 1
 			if card.rank == 'A':
 				leaps_for_ace += 1
-		
-		
+				
 		deck.evaluation = []
 		
 		for _ in range(leaps_for_eight + leaps_for_ace):
@@ -515,33 +516,38 @@ class Bridge:
 		for p in self.player_list:
 			if p != player:
 				other_players += f'\n{38 * " "}| {p.name} holds ({len(p.hand)}) card(s)'
+				p.show_hand()
+				
 		other_players += '\n'
 		print(other_players)
 	
-	def show_scores(self, bridge=False):
+	def show_scores(self, round_count = False, bridge=False):
 		if bridge:
 			self.activate_next_player()
 		
-		if not self.player.hand.cards:
-			print(f'The winner of this round is {self.player.name}')
-			print('')
-		else: print('Check your last score:')
+		if round_count:
+			print(f'\nScores this round:\n{18*"-"}')
+			for player in self.scores.keys():
+				self.scores[player] += player.hand.count_points() * deck.shufflings
+				if self.scores[player] == 125:
+					self.scores[player] = 0
+				print(player.name, " --> ", self.scores[player])
+			print(f'{18* "-"}')
+			
+		else:
+			print(f'\nLast Scores:\n{18*"-"}')
+			for player in self.scores.keys():
+				print(player.name, " --> ", self.scores[player])
+			print(f'{18*"-"}')
 		
-		for player in self.scores.keys():
-			self.scores[player] += player.hand.count_points()  # * deck.shufflings
-			if self.scores[player] == 125:
-				self.scores[player] = 0
-			print(player.name, " --> ", self.scores[player])
-		looser = sorted(self.scores.items(), key=lambda kv: (kv[1], kv[0])).pop()
-		print(f'The new shuffler for next round is {looser[0].name}')
-	
 	def play(self):
 		self.new_round(shuffler=0)
 		self.show_other_players(self.player)
 		deck.show()
 		self.player.show()
 		
-		while self.player.hand.cards:
+		
+		while True:  # self.player.hand.cards:
 			
 			print('TAB: toggle | CAPS: put | SHIFT: draw | SPACE: next Player | o: scores | r: new round | (q)uit game')
 			
@@ -660,7 +666,10 @@ class Bridge:
 			deck.show()
 			self.player.show()
 		
-		print('GAME OVER')
+		
+		self.activate_next_player()  # last round will be counted
+		self.show_scores(round_count=True)
+		self.new_round()
 		print('GAME OVER')
 
 
