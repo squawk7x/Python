@@ -389,7 +389,55 @@ class Player:
 			deck.check_is_bridge(card)
 
 
-class Game:
+class Bridge:
+	'''
+	
+	Playing Rules:
+	--------------
+	Bridge is played with 36 cards (4 suits and ranks from 6 to Ace) by 2-4 players.
+	Each player starts with 5 cards from blind. First player puts a card onto the stack
+	and can add more cards with same rank. The next player can play first card either
+	same suit or same rank and can play more cards with same rank. First the cards on hand
+	must be used and at least 1 card must be played or must be drawn from blind.
+	No more than one card can be drawn from blind, except a '6' must be covered.
+	
+	Special Cards:
+	--------------
+	6   must be covered by same player
+	7   next player gets 1 card from blind
+	8   next player gets 2 cards from blind and will be passed over
+	J   can be played to any suit and player can choose what suit must follow
+	Ace next player will be passed over. With multiple aces the next players will be passed over
+	
+	Special Rule 'Bridge':
+	----------------------
+	If there are the same 4 cards in a row on the stack, the player of the 4th card can choose wether or not
+	to finish tha actual round.
+	
+	Counting:
+	---------
+	A round is over when one player has no more cards.
+	The players note their points:
+						
+							 6   0
+							 7   0
+							 8   0
+							 9   0
+							10  10
+							J   20
+							Q   10
+							K   10
+							A   15
+
+	The points for several rounds will be added.
+	If the blind was empty and reshuffeled, the points of this round are doubled.
+	If a player finishes a round with a 'J' his score will be reduced by 20 for each 'J' of this last move.
+	If a player reaches exactly 125 points, his score is back on 0!
+	
+	The game is over when one player has more than 125 points.
+	
+	'''
+	
 	player = None
 	number_of_players = 3
 	player_list = []
@@ -616,5 +664,5 @@ class Game:
 		print('GAME OVER')
 
 
-game = Game()
-game.play()
+bridge = Bridge()
+bridge.play()
