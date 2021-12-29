@@ -1,3 +1,4 @@
+from platform import system
 import random
 import keyboard
 
@@ -326,6 +327,7 @@ class Player:
 			return True
 		else:
 			return False
+	
 	'''
 	def __eq__(self, other):
 		if self.score == other.score:
@@ -401,9 +403,10 @@ class Player:
 
 class Bridge:
 	'''
+	Game of Bridge
 
-	Rules Of The Game
-	--------------
+	Rules Of The Game:
+	------------------
 	Bridge is played with 36 cards (4 suits and ranks from 6 to Ace) by 2-4 players.
 	Each player starts with 5 cards from blind. First player puts a card onto the stack
 	and can add more cards with same rank. The next player can play first card either
@@ -443,16 +446,17 @@ class Bridge:
 	If the blind was empty and reshuffeled, the points of this round are doubled.
 	If a player finishes a round with a 'J' his score will be reduced by 20 for each 'J' of this last move.
 	If a player reaches exactly 125 points, his score is back on 0!
+	The player with the highest score starts the next round.
 
 	The game is over whenever one player has more than 125 points.
 
+	This program was written with love for Leoni & Ronja
 	'''
 	
 	player = None
 	number_of_players = 0
 	player_list = []
 	number_of_rounds = 0
-	scores = {}
 	shuffler = None
 	
 	def __init__(self):
@@ -470,7 +474,7 @@ class Bridge:
 			else:
 				print('Please enter value between 1 and 6')
 	
-	#self.start_round()
+	# self.start_round()
 	
 	def start_round(self):
 		
@@ -482,7 +486,7 @@ class Bridge:
 			for player in range(self.number_of_players):
 				self.player_list.append(Player(f'Player-{player + 1}'))
 		
-		#for player in self.player_list:
+		# for player in self.player_list:
 		#		player.score = 0
 		
 		for player in self.player_list:
@@ -535,11 +539,10 @@ class Bridge:
 				other_players += f'\n{38 * " "}| {p.name} holds ({len(p.hand)}) card(s)'
 				p.show_hand()
 		other_players += '\n'
-		print(other_players)
+		
+		print(f'{50 * " "}{other_players}')
 	
 	def finish_round(self):
-		
-		
 		self.show_other_players(self.player)
 		
 		if deck.get_top_card_from_stack().rank == 'J':
@@ -554,168 +557,175 @@ class Bridge:
 		
 		self.show_scores()
 		
-		print(f'{self.shuffler.name} will start next round')
-		self.start_round()
+		self.set_shuffler()
+		if self.shuffler.score <= 125:
+			print(f'{self.shuffler.name} will start next round')
+			self.start_round()
+		else:
+			print(f'\nThe Winner is ...\n')
+			winner = sorted(self.player_list, key=lambda player: player.score, reverse=True).pop()
+			print(f'{16 * " "}{winner.name}\n')
+			print(f'{13 * " "}G A M E  O V E R')
+			
+			keyboard.wait('n')
 	
 	def show_scores(self):
 		
-		print(f'\n Scores (round {self.number_of_rounds})\n{18 * "-"}')
+		print(f'\n Scores (round {self.number_of_rounds})\n{19 * "-"}')
 		for player in self.player_list:
-			print(f' {player.name} --> {player.score}')
-		print(f"{18 * '-'}\n return with 'e'\n")
+			print(f' {player.name} -->  '"{:3d}".format(player.score))
+		print(f"{19 * '-'}\n return with 'e'\n")
 		
 		keyboard.wait('e')
 	
 	def play(self):
 		self.start_round()
 		
-		# game
 		while True:
 			
-			# round
-			while self.player.hand.cards:
-				
-				self.show_other_players(self.player)
-				deck.show()
-				self.player.show()
-				
-				print(
-					'TAB: toggle | SHIFT: put | CTRL: draw | SPACE: next Player | s: scores | n: new game | q:uit game')
-				key = keyboard.read_hotkey(False)
-				
-				if key == 'j':
-					for suit in suits:
-						# self.player.hand.cards.append(Card(suit, '8'))
-						self.player.hand.cards.append(Card(suit, 'J'))
-				
-				elif key == 'q':
-					break
-				elif key == 'esc':
-					pass
-				elif key == 'n':
-					self.player_list = []
-					self.scores = {}
-					self.start_round()
-				elif key == 's':
-					self.show_scores()
-				elif key == 'tab':
-					self.player.toggle_possible_cards()
-				
-				elif key == 'alt':
-					'''
-					pull card possible, (not '6' on stack) if:
-					------------------------------------------
-					 card   possible  card
-					played    card    drawn
-						1       1       1       N
-						1       1       0       N
-						1       0       1       N
-						1       0       0       N
-						0       1       1       N
-						0       1       0       N
-						0       0       1       N
-						0       0       0       Y
+			self.show_other_players(self.player)
+			deck.show()
+			self.player.show()
+			
+			print(
+				'TAB: toggle | SHIFT: put | CTRL: draw | SPACE: next Player | s: scores | n: new game | q:uit game')
+			key = keyboard.read_hotkey(False)
+			
+			if key == 'j':
+				for suit in suits:
+					# self.player.hand.cards.append(Card(suit, '8'))
+					self.player.hand.cards.append(Card(suit, 'J'))
+			
+			elif key == 'q':
+				break
+			elif key == 'esc':
+				pass
+			elif key == 'n':
+				self.player_list = []
+				self.number_of_rounds = 0
+				self.start_round()
+			elif key == 's':
+				self.show_scores()
+			elif key == 'tab':
+				self.player.toggle_possible_cards()
+			
+			elif key == 'alt':
+				'''
+				pull card possible, (not '6' on stack) if:
+				------------------------------------------
+					card   possible  card
+				played    card    drawn
+					1       1       1       N
+					1       1       0       N
+					1       0       1       N
+					1       0       0       N
+					0       1       1       N
+					0       1       0       N
+					0       0       1       N
+					0       0       0       Y
 
-					'6' on stack:
-					-------------
-								1               Y
-					'''
+				'6' on stack:
+				-------------
+							1               Y
+				'''
+				
+				stack_card = deck.get_top_card_from_stack()
+				
+				if stack_card.rank == '6' and not self.player.hand.possible_cards:
+					self.player.get_card_from_blind()
+				
+				elif not self.player.hand.cards_played and not self.player.hand.possible_cards and not self.player.hand.cards_drawn:
+					self.player.get_card_from_blind()
+				
+				else:
+					pass
+			
+			if key == 'shift':
+				self.player.play_card()
+				if not self.player.hand.cards:
+					self.finish_round()
+			
+			if key == 'space':
+				
+				'''
+				next player possible, (no 6 on stack) if:
+
+					card   possible  card    next
+				played    card    drawn   player
+					1       1       1       Y
+					1       1       0       Y
+					1       0       1       Y
+					1       0       0       Y
+					0       1       1       N
+					0       1       0       N
+					0       0       1       Y
+					0       0       0       N
+				'''
+				
+				next_player = False
+				
+				if deck.check_is_bridge():
+					print(f'\n{17 * " "}* * * B R I D G E * * *\n')
+					print(f'{24 * " "}| Y | N |\n')
+					key = keyboard.read_hotkey(False)
+					if key == 'n':
+						pass
+					if key == 'y':
+						self.finish_round()
+				
+				elif self.player.hand.cards_played:
 					
-					stack_card = deck.get_top_card_from_stack()
+					if deck.get_top_card_from_stack().rank == '6':
+						next_player = False
 					
-					if stack_card.rank == '6' and not self.player.hand.possible_cards:
-						self.player.get_card_from_blind()
-					
-					elif not self.player.hand.cards_played and not self.player.hand.possible_cards and not self.player.hand.cards_drawn:
-						self.player.get_card_from_blind()
+					elif deck.get_top_card_from_stack().rank == 'J':
+						
+						while True:
+							print(f'\n{20 * " "}\u2191\u2191')
+							jchoice.show_js()
+							print(f'{11 * " "}TAB: toggle color | SPACE: set color / next player')
+							jkey = keyboard.read_hotkey(False)
+							
+							if jkey == 'tab':
+								jchoice.toggle_js()
+								deck.show()
+								self.player.show()
+							
+							if jkey == 'space':
+								jchoice.set_j()
+								break
+						
+						next_player = True
 					
 					else:
-						pass
+						next_player = True
 				
-				if key == 'shift':
-					self.player.play_card()
+				elif not self.player.hand.cards_played:
+					
+					if self.player.hand.possible_cards:
+						next_player = False
+					
+					if not self.player.hand.possible_cards and self.player.hand.cards_drawn:
+						next_player = True
+					
+					if not self.player.hand.possible_cards and not self.player.hand.cards_drawn:
+						next_player = False
 				
-				if key == 'space':
-					
-					'''
-					next player possible, (no 6 on stack) if:
-
-					 card   possible  card    next
-					played    card    drawn   player
-						1       1       1       Y
-						1       1       0       Y
-						1       0       1       Y
-						1       0       0       Y
-						0       1       1       N
-						0       1       0       N
-						0       0       1       Y
-						0       0       0       N
-					'''
-					
-					next_player = False
-					
-					if deck.check_is_bridge():
-						print(f'\n{20 * " "}* * * BRIDGE * * *\n')
-						print(f'{25 * " "}| Y | N |\n')
-						key = keyboard.read_hotkey(False)
-						if key == 'n':
-							pass
-						if key == 'y':
-							self.finish_round()
-					
-					elif self.player.hand.cards_played:
-						
-						if deck.get_top_card_from_stack().rank == '6':
-							next_player = False
-						
-						elif deck.get_top_card_from_stack().rank == 'J':
-							
-							while True:
-								print(f'\n{20 * " "}\u2191\u2191')
-								jchoice.show_js()
-								print(f'{11 * " "}TAB: toggle color | SPACE: set color / next player')
-								jkey = keyboard.read_hotkey(False)
-								
-								if jkey == 'tab':
-									jchoice.toggle_js()
-									deck.show()
-									self.player.show()
-								
-								if jkey == 'space':
-									jchoice.set_j()
-									break
-							
-							next_player = True
-						
-						else:
-							next_player = True
-					
-					elif not self.player.hand.cards_played:
-						
-						if self.player.hand.possible_cards:
-							next_player = False
-						
-						if not self.player.hand.possible_cards and self.player.hand.cards_drawn:
-							next_player = True
-						
-						if not self.player.hand.possible_cards and not self.player.hand.cards_drawn:
-							next_player = False
-					
-					if self.player.hand.cards == []:
-						return False
-					
-					elif next_player:
-						self.activate_next_player()
-			
+				if next_player:
+					self.activate_next_player()
+			'''
 			for self.player in self.player_list:
 				if self.player.score > 125:
 					self.show_scores()
 					print(f'The Winner is ...')
 					print(f'{sorted(self.player_list, key=lambda player: player.score, reverse=True).pop()}\n')
-					
+
 					print(f'GAME OVER')
 					return False
+			'''
 
 
 bridge = Bridge()
+
 bridge.play()
+
