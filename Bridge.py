@@ -201,7 +201,7 @@ class Deck:
 		print(f'{bridge}')
 	
 	def check_is_bridge(self):
-		if len(deck.bridge) >= 4:
+		if len(deck.bridge) == 4:
 			return True
 		else:
 			return False
@@ -517,8 +517,8 @@ class Bridge:
 		self.evaluate()
 	
 	def evaluate(self):
-		leaps_for_ace = 0
-		leaps_for_eight = 0
+		aces = 0
+		eights = 0
 		
 		for card in deck.evaluation:
 			
@@ -529,13 +529,34 @@ class Bridge:
 				self.player.get_card_from_blind()
 				self.player.get_card_from_blind()
 				self.player.hand.cards_drawn.clear()
-				leaps_for_eight = 1
+				eights = 1
 			if card.rank == 'A':
-				leaps_for_ace += 1
+				aces += 1
 		
-		deck.evaluation = []
+		deck.evaluation.clear()
 		
-		for _ in range(leaps_for_eight + leaps_for_ace):
+		'''
+		#Player/A	1	2	3	4
+
+			2		1	3	1	3
+			3		1	2	4	2
+			4		1	2	3	5
+			5		1	2	3	4
+			6		1	2	3	4
+
+		'''
+		if aces > self.number_of_players:
+			aces -= 2
+		if aces == self.number_of_players:
+			aces = aces + 1
+		for ace in range(aces):
+			self.activate_next_player()
+		
+		if eights > self.number_of_players:
+			eights -= 2
+		if eights == self.number_of_players:
+			eights = eights + 1
+		for eight in range(eights):
 			self.activate_next_player()
 	
 	def show_other_players(self, player: Player):
@@ -593,12 +614,36 @@ class Bridge:
 			
 			key = keyboard.read_hotkey(False)
 			
+			'''
+			def on_click(x, y, button, pressed):
+
+				if button == mouse.Button.left:
+					keyboard.send('shift')
+
+				if button == mouse.Button.middle:
+					keyboard.send('space')
+
+				if button == mouse.Button.right:
+					keyboard.send('alt')
+
+			def on_scroll(x, y, dx, dy):
+				keyboard.send('tab')
+
+			with mouse.Listener(
+					on_click=on_click,
+					on_scroll=on_scroll) as listener:
+					listener.start()
+			'''
+			
 			if key == 'j':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, 'J'))
 			if key == '8':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, '8'))
+			if key == 'a':
+				for suit in suits:
+					self.player.hand.cards.append(Card(suit, 'A'))
 			elif key == 'q':
 				break
 			elif key == 'n':
@@ -719,7 +764,7 @@ class Bridge:
 					self.activate_next_player()
 
 
-bridge = Bridge()
-
-bridge.play()
+if __name__ == "__main__":
+	bridge = Bridge()
+	bridge.play()
 
