@@ -45,9 +45,12 @@ class Card:
 	
 	def set_value(self, rank):
 		value = 0
-		if rank in {'10', 'Q', 'K'}: value = 10
-		if rank == 'A': value = 15
-		if rank == 'J': value = 20
+		if rank in {'10', 'Q', 'K'}:
+			value = 10
+		if rank == 'A':
+			value = 15
+		if rank == 'J':
+			value = 20
 		return value
 	
 	def get_value(self):
@@ -372,7 +375,8 @@ class Player:
 				cards += str(card)
 			else:
 				cards += '## '
-		print(f'{self.name} holds ({len(self.hand.cards)}) card(s) [{self.hand.count_points()} points]:')
+		print(
+			f'{self.name} holds ({len(self.hand.cards)}) card(s) [{self.hand.count_points()} points]:')
 		print(cards)
 	
 	def show_possible_cards(self):
@@ -526,14 +530,41 @@ class Bridge:
 				self.player.get_card_from_blind()
 				self.player.hand.cards_drawn.clear()
 			if card.rank == '8':
-				self.player.get_card_from_blind()
-				self.player.get_card_from_blind()
-				self.player.hand.cards_drawn.clear()
-				eights = 1
+				eights += 1
 			if card.rank == 'A':
 				aces += 1
 		
 		deck.evaluation.clear()
+		
+		if eights == 1 or (eights and self.number_of_players == 2):
+			for eight in range(eights):
+				self.player.get_card_from_blind()
+				self.player.get_card_from_blind()
+				self.player.hand.cards_drawn.clear()
+			self.activate_next_player()
+		
+		elif eights >= 2:
+			print(f"\n{16 * ' '}* * * How to share the 8's * * *\n")
+			print(f'{16 * " "}| (n)ext player | (a)ll players |\n')
+			key = keyboard.read_hotkey(False)
+			if key == 'n':
+				for eight in range(eights):
+					self.player.get_card_from_blind()
+					self.player.get_card_from_blind()
+					self.player.hand.cards_drawn.clear()
+				self.activate_next_player()
+				ya
+			if key == 'a':
+				leap = 1
+				while leap <= eights:
+					if leap != self.number_of_players:
+						self.player.get_card_from_blind()
+						self.player.get_card_from_blind()
+						self.player.hand.cards_drawn.clear()
+					else:
+						eights += 1
+					leap += 1
+					self.activate_next_player()
 		
 		'''
 		#Player/A	1	2	3	4
@@ -543,20 +574,12 @@ class Bridge:
 			4		1	2	3	5
 			5		1	2	3	4
 			6		1	2	3	4
-
 		'''
 		if aces > self.number_of_players:
 			aces -= 2
 		if aces == self.number_of_players:
-			aces = aces + 1
+			aces += 1
 		for ace in range(aces):
-			self.activate_next_player()
-		
-		if eights > self.number_of_players:
-			eights -= 2
-		if eights == self.number_of_players:
-			eights = eights + 1
-		for eight in range(eights):
 			self.activate_next_player()
 	
 	def show_other_players(self, player: Player):
@@ -767,4 +790,3 @@ class Bridge:
 if __name__ == "__main__":
 	bridge = Bridge()
 	bridge.play()
-
