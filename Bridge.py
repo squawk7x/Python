@@ -553,7 +553,6 @@ class Bridge:
 					self.player.get_card_from_blind()
 					self.player.hand.cards_drawn.clear()
 				self.activate_next_player()
-				ya
 			if key == 'a':
 				leap = 1
 				while leap <= eights:
