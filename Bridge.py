@@ -395,10 +395,11 @@ class Player:
 			self.hand.cards.insert(0, card)
 			self.hand.possible_cards.insert(0, card)
 	
-	def get_card_from_blind(self):
-		card = deck.card_from_blind()
-		self.hand.cards.append(card)
-		self.hand.cards_drawn.append(card)
+	def get_card_from_blind(self, cards=1):
+		for card in range(cards):
+			card = deck.card_from_blind()
+			self.hand.cards.append(card)
+			self.hand.cards_drawn.append(card)
 	
 	def play_card(self):
 		if self.hand.possible_cards:
@@ -442,15 +443,15 @@ class Bridge:
 	A round is over when one player has no more cards.
 	The players note their points:
 
-							 6   0
-							 7   0
-							 8   0
-							 9   0
-							10  10
-							J   20  (-20)
-							Q   10
-							K   10
-							A   15
+													 6   0
+													 7   0
+													 8   0
+													 9   0
+													10  10
+													J   20  (-20)
+													Q   10
+													K   10
+													A   15
 
 	The points of several rounds will be added.
 	If the blind was empty and the stack was reshuffeled, the points of this round are doubled, tripled, ...
@@ -538,27 +539,24 @@ class Bridge:
 		
 		if eights == 1 or (eights and self.number_of_players == 2):
 			for eight in range(eights):
-				self.player.get_card_from_blind()
-				self.player.get_card_from_blind()
-				self.player.hand.cards_drawn.clear()
+				self.player.get_card_from_blind(2)
+			self.player.hand.cards_drawn.clear()
 			self.activate_next_player()
 		
 		elif eights >= 2:
-			print(f"\n{16 * ' '}* * * How to share the 8's * * *\n")
+			print(f"\n{16 * ' '}? ? ? How to share the 8's ? ? ?\n")
 			print(f'{16 * " "}| (n)ext player | (a)ll players |\n')
 			key = keyboard.read_hotkey(False)
 			if key == 'n':
 				for eight in range(eights):
-					self.player.get_card_from_blind()
-					self.player.get_card_from_blind()
-					self.player.hand.cards_drawn.clear()
+					self.player.get_card_from_blind(2)
+				self.player.hand.cards_drawn.clear()
 				self.activate_next_player()
 			if key == 'a':
 				leap = 1
 				while leap <= eights:
 					if leap != self.number_of_players:
-						self.player.get_card_from_blind()
-						self.player.get_card_from_blind()
+						self.player.get_card_from_blind(2)
 						self.player.hand.cards_drawn.clear()
 					else:
 						eights += 1
@@ -680,20 +678,20 @@ class Bridge:
 				'''
 				pull card possible, (not '6' on stack) if:
 				------------------------------------------
-					card   possible  card
+						card   possible  card
 				played    card    drawn
-					1       1       1       N
-					1       1       0       N
-					1       0       1       N
-					1       0       0       N
-					0       1       1       N
-					0       1       0       N
-					0       0       1       N
-					0       0       0       Y
+						1       1       1       N
+						1       1       0       N
+						1       0       1       N
+						1       0       0       N
+						0       1       1       N
+						0       1       0       N
+						0       0       1       N
+						0       0       0       Y
 
 				'6' on stack:
 				-------------
-							1               Y
+										1               Y
 				'''
 				
 				stack_card = deck.get_top_card_from_stack()
@@ -717,16 +715,16 @@ class Bridge:
 				'''
 				next player possible, (no 6 on stack) if:
 
-					card   possible  card    next
+						card   possible  card    next
 				played    card    drawn   player
-					1       1       1       Y
-					1       1       0       Y
-					1       0       1       Y
-					1       0       0       Y
-					0       1       1       N
-					0       1       0       N
-					0       0       1       Y
-					0       0       0       N
+						1       1       1       Y
+						1       1       0       Y
+						1       0       1       Y
+						1       0       0       Y
+						0       1       1       N
+						0       1       0       N
+						0       0       1       Y
+						0       0       0       N
 				'''
 				
 				next_player = False
@@ -749,7 +747,8 @@ class Bridge:
 						
 						print(f'\n{20 * " "}\u2191\u2191')
 						jchoice.show_js()
-						print(f'{5 * " "}| TAB: toggle color | SPACE: set color / next player |')
+						print(
+							f'{5 * " "}| TAB: toggle color | SPACE: set color / next player |')
 						
 						while True:
 							jkey = keyboard.read_hotkey(False)
@@ -760,7 +759,8 @@ class Bridge:
 								self.player.show()
 								print(f'\n{20 * " "}\u2191\u2191')
 								jchoice.show_js()
-								print(f'{5 * " "}| TAB: toggle color | SPACE: set color / next player |')
+								print(
+									f'{5 * " "}| TAB: toggle color | SPACE: set color / next player |')
 							
 							if jkey == 'space':
 								jchoice.set_j()
