@@ -1,5 +1,7 @@
+from os import close
 from platform import system
 import random
+from datetime import date
 import keyboard
 from pynput import mouse
 
@@ -230,7 +232,7 @@ deck = Deck()
 
 
 class Handdeck:
-	''' Represents the players cards with 'some' functionality '''
+	''' Represents the player's cards with some functionality '''
 	
 	def __init__(self):
 		self.cards = []
@@ -466,6 +468,7 @@ class Bridge:
 	number_of_players = 0
 	player_list = []
 	number_of_rounds = 0
+	number_of_games = 0
 	shuffler = None
 	
 	def __init__(self):
@@ -544,8 +547,8 @@ class Bridge:
 			self.activate_next_player()
 		
 		elif eights >= 2:
-			print(f"\n{16 * ' '}? ? ? How to share the 8's ? ? ?\n")
-			print(f'{16 * " "}| (n)ext player | (a)ll players |\n')
+			print(f"\n{13 * ' '}? ? ? How to share the 8's ? ? ?\n")
+			print(f'{13 * " "}| (n)ext player | (a)ll players |\n')
 			key = keyboard.read_hotkey(False)
 			if key == 'n':
 				for eight in range(eights):
@@ -597,6 +600,23 @@ class Bridge:
 				player.score = 0
 			player.show_hand(open=True)
 		
+		list = sorted(self.player_list, key=lambda player: player.name)
+		try:
+			f = open(f'{date.today()}_scores.txt')
+		except IOError:
+			f = open(f'{date.today()}_scores.txt', 'a')
+			f.write(f'\n\nGame - Round   ')
+			for player in list:
+				f.write(f'{player.name} ')
+			f.write('\n')
+		finally:
+			f.close()
+			with open(f'{date.today()}_scores.txt', 'a') as f:
+				f.write(f'  {self.number_of_games:2d} -{self.number_of_rounds:2d}{7 * " "}')
+				for player in list:
+					f.write("  {:3d}    ".format(player.score))
+				f.write('\n')
+		
 		self.show_scores()
 		
 		self.set_shuffler()
@@ -606,21 +626,27 @@ class Bridge:
 		else:
 			print(f'\nThe Winner is ...\n')
 			# winner = sorted(self.player_list, key=lambda player: player.score, reverse=True).pop()
-			print(f'{16 * " "}{min(self.player_list).name}\n')
-			print(f'{13 * " "}G A M E  O V E R')
-			print(f'{7 * " "}| n: new game | q:uit game |')
+			print(f'{18 * " "}{min(self.player_list).name}\n')
+			print(f'{27 * " "}+ + + G A M E  O V E R + + + \n')
+			print(f'{34 * " "}| (n)ew game |\n')
 			keyboard.wait('n')
+			self.number_of_games += 1
 	
 	def show_scores(self):
+		try:
+			with open(f'{date.today()}_scores.txt') as f:
+				for line in f:
+					print(line, end='')
+				print('\n')
+		except IOError:
+			print('\n\nPlaying 1st round - No score list availabe yet')
 		
-		print(f'\n Scores (round {self.number_of_rounds})\n{19 * "-"}')
-		for player in self.player_list:
-			print(f' {player.name} -->  '"{:3d}".format(player.score))
-		print(f"{19 * '-'}\n return with 'e'\n")
-		
-		keyboard.wait('e')
+		print(f"(r)eturn\n")
+		keyboard.wait('r')
 	
 	def play(self):
+		self.number_of_games += 1
+		
 		self.start_round()
 		
 		while True:
@@ -654,7 +680,9 @@ class Bridge:
 					on_scroll=on_scroll) as listener:
 					listener.start()
 			'''
-			
+			if key == 'c':
+				for suit in suits:
+					self.player.hand.cards.clear()
 			if key == 'j':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, 'J'))
