@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 from os import close
 from platform import system
 import random
 from datetime import date
+=======
+from platform import system
+import random
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 import keyboard
 from pynput import mouse
 
@@ -47,12 +52,18 @@ class Card:
 	
 	def set_value(self, rank):
 		value = 0
+<<<<<<< HEAD
 		if rank in {'10', 'Q', 'K'}:
 			value = 10
 		if rank == 'A':
 			value = 15
 		if rank == 'J':
 			value = 20
+=======
+		if rank in {'10', 'Q', 'K'}: value = 10
+		if rank == 'A': value = 15
+		if rank == 'J': value = 20
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 		return value
 	
 	def get_value(self):
@@ -206,7 +217,11 @@ class Deck:
 		print(f'{bridge}')
 	
 	def check_is_bridge(self):
+<<<<<<< HEAD
 		if len(deck.bridge) == 4:
+=======
+		if len(deck.bridge) >= 4:
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 			return True
 		else:
 			return False
@@ -232,7 +247,11 @@ deck = Deck()
 
 
 class Handdeck:
+<<<<<<< HEAD
 	''' Represents the player's cards with some functionality '''
+=======
+	''' Represents the players cards with 'some' functionality '''
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 	
 	def __init__(self):
 		self.cards = []
@@ -335,7 +354,10 @@ class Player:
 			return True
 		else:
 			return False
+<<<<<<< HEAD
 	
+=======
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 	'''
 	def __eq__(self, other):
 		if self.score == other.score:
@@ -375,10 +397,16 @@ class Player:
 		for card in self.hand.cards:
 			if open:
 				cards += str(card)
+<<<<<<< HEAD
 			else:
 				cards += '## '
 		print(
 			f'{self.name} holds ({len(self.hand.cards)}) card(s) [{self.hand.count_points()} points]:')
+=======
+			else: 
+				cards += '## '
+		print(f'{self.name} holds ({len(self.hand.cards)}) card(s) [{self.hand.count_points()} points]:')
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 		print(cards)
 	
 	def show_possible_cards(self):
@@ -397,11 +425,18 @@ class Player:
 			self.hand.cards.insert(0, card)
 			self.hand.possible_cards.insert(0, card)
 	
+<<<<<<< HEAD
 	def get_card_from_blind(self, cards=1):
 		for card in range(cards):
 			card = deck.card_from_blind()
 			self.hand.cards.append(card)
 			self.hand.cards_drawn.append(card)
+=======
+	def get_card_from_blind(self):
+		card = deck.card_from_blind()
+		self.hand.cards.append(card)
+		self.hand.cards_drawn.append(card)
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 	
 	def play_card(self):
 		if self.hand.possible_cards:
@@ -445,6 +480,7 @@ class Bridge:
 	A round is over when one player has no more cards.
 	The players note their points:
 
+<<<<<<< HEAD
 													 6   0
 													 7   0
 													 8   0
@@ -454,6 +490,17 @@ class Bridge:
 													Q   10
 													K   10
 													A   15
+=======
+							 6   0
+							 7   0
+							 8   0
+							 9   0
+							10  10
+							J   20  (-20)
+							Q   10
+							K   10
+							A   15
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 
 	The points of several rounds will be added.
 	If the blind was empty and the stack was reshuffeled, the points of this round are doubled, tripled, ...
@@ -468,7 +515,10 @@ class Bridge:
 	number_of_players = 0
 	player_list = []
 	number_of_rounds = 0
+<<<<<<< HEAD
 	number_of_games = 0
+=======
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 	shuffler = None
 	
 	def __init__(self):
@@ -486,7 +536,11 @@ class Bridge:
 			else:
 				print('Please enter value between 1 and 6')
 	
+<<<<<<< HEAD
 	# self.start_round()
+=======
+	#self.start_round()
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 	
 	def start_round(self):
 		
@@ -511,8 +565,12 @@ class Bridge:
 			self.shuffler = self.player_list[0]
 		else:
 			self.shuffler = max(self.player_list)
+<<<<<<< HEAD
 	
 	# self.shuffler = (sorted(self.player_list, key=lambda player: player.score)).pop()
+=======
+			#self.shuffler = (sorted(self.player_list, key=lambda player: player.score)).pop()
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 	
 	def get_shuffler(self):
 		return self.shuffler
@@ -525,8 +583,13 @@ class Bridge:
 		self.evaluate()
 	
 	def evaluate(self):
+<<<<<<< HEAD
 		aces = 0
 		eights = 0
+=======
+		leaps_for_ace = 0
+		leaps_for_eight = 0
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 		
 		for card in deck.evaluation:
 			
@@ -534,6 +597,7 @@ class Bridge:
 				self.player.get_card_from_blind()
 				self.player.hand.cards_drawn.clear()
 			if card.rank == '8':
+<<<<<<< HEAD
 				eights += 1
 			if card.rank == 'A':
 				aces += 1
@@ -580,15 +644,33 @@ class Bridge:
 		if aces == self.number_of_players:
 			aces += 1
 		for ace in range(aces):
+=======
+				self.player.get_card_from_blind()
+				self.player.get_card_from_blind()
+				self.player.hand.cards_drawn.clear()
+				leaps_for_eight = 1
+			if card.rank == 'A':
+				leaps_for_ace += 1
+		
+		deck.evaluation = []
+		
+		for _ in range(leaps_for_eight + leaps_for_ace):
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 			self.activate_next_player()
 	
 	def show_other_players(self, player: Player):
 		for p in self.player_list:
 			if p != player:
 				p.show_hand(open=False)
+<<<<<<< HEAD
 	
 	def finish_round(self):
 		
+=======
+
+	def finish_round(self):
+
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 		if deck.get_top_card_from_stack().rank == 'J':
 			self.player.score -= 20 * len(deck.bridge) * deck.shufflings
 		
@@ -600,6 +682,7 @@ class Bridge:
 				player.score = 0
 			player.show_hand(open=True)
 		
+<<<<<<< HEAD
 		list = sorted(self.player_list, key=lambda player: player.name)
 		try:
 			f = open(f'{date.today()}_scores.txt')
@@ -619,12 +702,17 @@ class Bridge:
 		
 		self.show_scores()
 		
+=======
+		self.show_scores()
+
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 		self.set_shuffler()
 		if self.shuffler.score <= 125:
 			print(f'{self.shuffler.name} will start next round')
 			self.start_round()
 		else:
 			print(f'\nThe Winner is ...\n')
+<<<<<<< HEAD
 			# winner = sorted(self.player_list, key=lambda player: player.score, reverse=True).pop()
 			print(f'{18 * " "}{min(self.player_list).name}\n')
 			print(f'{27 * " "}+ + + G A M E  O V E R + + + \n')
@@ -651,12 +739,35 @@ class Bridge:
 		
 		while True:
 			print(f'\n{100 * "-"}')
+=======
+			#winner = sorted(self.player_list, key=lambda player: player.score, reverse=True).pop()
+			print(f'{16*" "}{min(self.player_list).name}\n')
+			print(f'{13*" "}G A M E  O V E R')
+			print(f'{7*" "}| n: new game | q:uit game |')
+			keyboard.wait('n')
+		
+	def show_scores(self):
+		
+		print(f'\n Scores (round {self.number_of_rounds})\n{19 * "-"}')
+		for player in self.player_list:
+			print(f' {player.name} -->  '"{:3d}".format(player.score))
+		print(f"{19 * '-'}\n return with 'e'\n")
+		
+		keyboard.wait('e')
+	
+	def play(self):
+		self.start_round()
+
+		while True:
+			print(f'\n{100*"-"}')
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 			self.show_other_players(self.player)
 			deck.show()
 			self.player.show()
 			
 			print(
 				'\n| TAB: toggle | SHIFT: put | ALT: draw | SPACE: next Player | s: scores | n: new game | q:uit game |')
+<<<<<<< HEAD
 			
 			key = keyboard.read_hotkey(False)
 			
@@ -683,15 +794,23 @@ class Bridge:
 			if key == 'c':
 				for suit in suits:
 					self.player.hand.cards.clear()
+=======
+
+			key = keyboard.read_hotkey(False)
+			
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 			if key == 'j':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, 'J'))
 			if key == '8':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, '8'))
+<<<<<<< HEAD
 			if key == 'a':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, 'A'))
+=======
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 			elif key == 'q':
 				break
 			elif key == 'n':
@@ -702,6 +821,7 @@ class Bridge:
 			elif key == 'tab':
 				self.player.toggle_possible_cards()
 			elif key == 'alt':
+<<<<<<< HEAD
 				
 				'''
 				pull card possible, (not '6' on stack) if:
@@ -720,6 +840,26 @@ class Bridge:
 				'6' on stack:
 				-------------
 										1               Y
+=======
+
+				'''
+				pull card possible, (not '6' on stack) if:
+				------------------------------------------
+					card   possible  card
+				played    card    drawn
+					1       1       1       N
+					1       1       0       N
+					1       0       1       N
+					1       0       0       N
+					0       1       1       N
+					0       1       0       N
+					0       0       1       N
+					0       0       0       Y
+
+				'6' on stack:
+				-------------
+							1               Y
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 				'''
 				
 				stack_card = deck.get_top_card_from_stack()
@@ -743,6 +883,7 @@ class Bridge:
 				'''
 				next player possible, (no 6 on stack) if:
 
+<<<<<<< HEAD
 						card   possible  card    next
 				played    card    drawn   player
 						1       1       1       Y
@@ -753,12 +894,28 @@ class Bridge:
 						0       1       0       N
 						0       0       1       Y
 						0       0       0       N
+=======
+					card   possible  card    next
+				played    card    drawn   player
+					1       1       1       Y
+					1       1       0       Y
+					1       0       1       Y
+					1       0       0       Y
+					0       1       1       N
+					0       1       0       N
+					0       0       1       Y
+					0       0       0       N
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 				'''
 				
 				next_player = False
 				
 				if deck.check_is_bridge():
+<<<<<<< HEAD
 					print(f'\n{17 * " "}* * * B R I D G E * * *\n')
+=======
+					print(f'\n{17*" "}* * * B R I D G E * * *\n')
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 					print(f'{24 * " "}| Y | N |\n')
 					key = keyboard.read_hotkey(False)
 					if key == 'n':
@@ -772,6 +929,7 @@ class Bridge:
 						next_player = False
 					
 					elif deck.get_top_card_from_stack().rank == 'J':
+<<<<<<< HEAD
 						
 						print(f'\n{20 * " "}\u2191\u2191')
 						jchoice.show_js()
@@ -781,15 +939,30 @@ class Bridge:
 						while True:
 							jkey = keyboard.read_hotkey(False)
 							
+=======
+
+						print(f'\n{20 * " "}\u2191\u2191')
+						jchoice.show_js()
+						print(f'{5* " "}| TAB: toggle color | SPACE: set color / next player |')
+						
+						while True:
+							jkey = keyboard.read_hotkey(False)
+
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 							if jkey == 'tab':
 								jchoice.toggle_js()
 								deck.show()
 								self.player.show()
 								print(f'\n{20 * " "}\u2191\u2191')
 								jchoice.show_js()
+<<<<<<< HEAD
 								print(
 									f'{5 * " "}| TAB: toggle color | SPACE: set color / next player |')
 							
+=======
+								print(f'{5* " "}| TAB: toggle color | SPACE: set color / next player |')
+								
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
 							if jkey == 'space':
 								jchoice.set_j()
 								break
@@ -814,6 +987,13 @@ class Bridge:
 					self.activate_next_player()
 
 
+<<<<<<< HEAD
 if __name__ == "__main__":
 	bridge = Bridge()
 	bridge.play()
+=======
+bridge = Bridge()
+
+bridge.play()
+
+>>>>>>> adb6adc (20211231-09:07 Game of Bridge)
