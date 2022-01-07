@@ -426,7 +426,7 @@ class Bridge:
 	--------------
 	6   must be covered by same player, drawing cards until possible move
 	7   next player must draw 1 card from blind
-	8   next player must draw 2 cards for each '8' from blind and will be passed over - or -
+	8   next player must draw all cards (2 for each '8') from blind and will be passed over - or -
 		following players must draw 2 cards and will be passed over 
 	J   can be played to any suit and player can choose which suit must follow
 	A   next player will be passed over. With multiple 'A' the next players will be passed over
@@ -441,15 +441,15 @@ class Bridge:
 	A round is over when one player has no more cards.
 	The players note their points:
 
-			6   0
-			7   0
-			8   0
-			9   0
-		10  10
-		J   20  (-20)
-		Q   10
-		K   10
-		A   15
+	6   0
+	7   0
+	8   0
+	9   0
+	10  10
+	J   20  (-20)
+	Q   10
+	K   10
+	A   15
 
 	The points of several rounds will be added.
 	If the blind was empty and the stack was reshuffeled, the points of this round are doubled, tripled, ...
@@ -473,7 +473,7 @@ class Bridge:
 			
 			try:
 				print("Enter number of players:")
-				self.number_of_players = int(keyboard.read_hotkey(False))
+				self.number_of_players = int(keyboard.read_hotkey(suppress=False))
 			except ValueError:
 				print('Valid number, please')
 				continue
@@ -541,7 +541,7 @@ class Bridge:
 		elif eights >= 2:
 			print(f"\n{13 * ' '}? ? ? How to share the 8's ? ? ?\n")
 			print(f'{13 * " "}| (n)ext player | (a)ll players |\n')
-			key = keyboard.read_hotkey(False)
+			key = keyboard.read_hotkey(suppress=False)
 			if key == 'n':
 				for eight in range(eights):
 					self.player.get_card_from_blind(2)
@@ -623,7 +623,7 @@ class Bridge:
 			print(f'{18 * " "}{min(self.player_list).name}\n')
 			print(f'{27 * " "}+ + + G A M E  O V E R + + + \n')
 			print(f'{34 * " "}| (n)ew game |\n')
-			keyboard.wait('n')
+			keyboard.wait('n', suppress=False)
 			self.number_of_games += 1
 	
 	def show_scores(self, wait_for_keyboard=True):
@@ -635,7 +635,7 @@ class Bridge:
 		
 		if wait_for_keyboard:
 			print(f'(r)eturn\n')
-			keyboard.wait('r')
+			keyboard.wait('r', suppress=False)
 	
 	def play(self):
 		self.number_of_games += 1
@@ -651,7 +651,7 @@ class Bridge:
 			print(
 				'\n| TAB: toggle | SHIFT: put | ALT: draw | SPACE: next Player | s: scores | n: new game | q:uit game |')
 			
-			key = keyboard.read_hotkey(False)
+			key = keyboard.read_hotkey(suppress=False)
 			
 			if key == 'c':
 				for suit in suits:
@@ -733,11 +733,12 @@ class Bridge:
 				if deck.check_is_bridge():
 					print(f'\n{17 * " "}* * * B R I D G E * * *\n')
 					print(f'{24 * " "}| Y | N |\n')
-					key = keyboard.read_hotkey(False)
+					key = keyboard.read_hotkey(suppress=False)
 					if key == 'n':
 						pass
 					if key == 'y':
 						self.finish_round()
+						continue
 				
 				if self.player.hand.cards_played:
 					
@@ -752,7 +753,7 @@ class Bridge:
 							f'{5 * " "}| TAB: toggle color | SPACE: set color / next player |')
 						
 						while True:
-							jkey = keyboard.read_hotkey(False)
+							jkey = keyboard.read_hotkey(suppress=False)
 							
 							if jkey == 'tab':
 								jchoice.toggle_js()
