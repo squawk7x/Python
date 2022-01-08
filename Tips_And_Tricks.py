@@ -508,7 +508,7 @@ LEGB -  Local, Enclosing, Global, Built-in
 '''
 
 
-# x = 'Global x'
+x = 'Global x'
 
 def test():
 	global x
