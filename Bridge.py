@@ -604,7 +604,7 @@ class Bridge:
 		except IOError:
 			print(f'\n\nPlaying 1st round - No score list availabe yet\n')
 		if wait_for_keyboard:
-			print(f'(r)eturn\n')
+			print(f'{22 * " "}(r)eturn\n')
 			keyboard.wait('r', suppress=False)
 	
 	def play(self):
