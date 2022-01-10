@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import random
 from datetime import date
 import random
 import keyboard
-from pynput import mouse
 
 suits = ['\u2666', '\u2665', '\u2660', '\u2663']
 ranks = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
@@ -651,12 +649,15 @@ class Bridge:
 			if key == 'c':
 				for suit in suits:
 					self.player.hand.cards.clear()
-			if key == 'j':
+			if key == '6':
 				for suit in suits:
-					self.player.hand.cards.append(Card(suit, 'J'))
+					self.player.hand.cards.append(Card(suit, '6'))
 			if key == '8':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, '8'))
+			if key == 'j':
+				for suit in suits:
+					self.player.hand.cards.append(Card(suit, 'J'))
 			if key == 'a':
 				for suit in suits:
 					self.player.hand.cards.append(Card(suit, 'A'))
@@ -687,7 +688,7 @@ class Bridge:
 
 				'6' on stack:
 				-------------
-												0		1		Y
+										0		1		Y
 				'''
 				
 				stack_card = deck.get_top_card_from_stack()
@@ -699,8 +700,8 @@ class Bridge:
 					pass
 			if key == 'shift':
 				self.player.play_card()
-				if not self.player.hand.cards:
-					self.finish_round()
+			#if not self.player.hand.cards:
+			#	self.finish_round()
 			if key == 'space':
 				
 				'''
