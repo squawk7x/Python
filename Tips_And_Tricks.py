@@ -313,7 +313,6 @@ SORTING
 dict by value
 '''
 
-
 # How to sort a Python dict by value
 # (== get a representation sorted by value)
 
@@ -325,9 +324,9 @@ sorted(xs.items(), key=lambda x: x[1])
 # Or:
 
 import operator
+
 sorted(xs.items(), key=operator.itemgetter(1))
 [('d', 1), ('c', 2), ('b', 3), ('a', 4)]
-
 
 # -------------------------------------------------
 
@@ -507,8 +506,8 @@ LEGB -  Local, Enclosing, Global, Built-in
 
 '''
 
-
 x = 'Global x'
+
 
 def test():
 	global x
@@ -633,6 +632,257 @@ print(print_h1)  # <function html_tag.<locals>.wrap_text at 0x7f64ccc58820>
 
 print_h1('Test Headline!')
 print_h1('Another Headline!')
+
+
+def outer_function(msg):
+	def inner_function():
+		print(msg)
+	
+	return inner_function()
+
+
+hi_func = outer_function('Hi')
+bye_func = outer_function('Bye')
+
+hi_func()
+bye_func()
+
+'''
+DECORATORS
+
+'''
+
+
+def decorator_function(original_function):
+	def wrapper_function(*args, **kwargs):
+		print('wrapper executed this before {}'.format(original_function.__name__))
+		return original_function(*args, **kwargs)
+	
+	return wrapper_function
+
+
+# without () waits until wrapper_function is executed
+
+@decorator_function
+def display():
+	print('display function ran')
+
+
+@decorator_function
+def display_info(name, age):
+	print('display_info runs with 2 arguments ({}, {}'.format(name, age))
+
+
+# decorated_display = decorator_function(display)
+# decorated_display()
+
+display()
+display_info('John', 25)
+
+
+class decorator_class():
+	
+	def __init__(self, original_function):
+		self.original_function = original_function
+	
+	def __call__(self, *args, **kwargs):
+		print('call method executed this before {}'.format(self.original_function.__name__))
+		return self.original_function(*args, **kwargs)
+
+
+@decorator_class
+def display():
+	print('display function ran')
+
+
+@decorator_class
+def display_info(name, age):
+	print('display_info runs with 2 arguments ({}, {})'.format(name, age))
+
+
+display()
+display_info('John', 25)
+
+# ------------------------------------------------
+# 3
+from functools import wraps
+
+
+# 2
+def mapper(func):
+	# 3
+	@wraps(func)
+	def inner(values):
+		"""This is the inner()"""
+		return [func(value) for value in values]
+	
+	return inner
+
+
+@mapper
+# 1
+def camelcase(s: str):
+	"""Turn strings_like_this into StringsLikeThis"""
+	return ''.join([word.capitalize() for word in s.split('_')])
+
+
+names = ['a_b', 'c_d', 'e_f']
+
+print(camelcase(names))
+print(camelcase.__doc__)
+# This is the inner() -> functools
+# after @wraps:
+# Turn strings_like_this into StringsLikeThis
+
+# ------------------------------------------------
+# Caching decorator
+# usable for pure functions (function has same result with same arguments)
+
+from functools import wraps
+
+
+def cache(func):
+	saved = {}
+	
+	@wraps(func)
+	def newfunc(*args):
+		if args in saved:
+			return newfunc(*args)
+		result = func(*args)
+		saved[args] = result
+		return result
+	
+	return newfunc
+
+
+# ------------------------------------------------
+import random
+
+
+def power_of(exponent):
+	def decorator(func):
+		def inner():
+			return func() ** exponent
+		
+		return inner
+	
+	return decorator
+
+
+@power_of(2)
+def random_odd_digit():
+	return random.choice([1, 3, 5, 7, 9])
+
+
+print(random_odd_digit())
+
+# ------------------------------------------------
+import random
+
+
+def power_of(arg):
+	def decorator(func):
+		def inner():
+			return func() ** exponent
+		
+		return inner
+	
+	if callable(arg):
+		exponent = 2
+		return decorator(arg)
+	else:
+		exponent = arg
+		return decorator
+
+
+@power_of(2)
+def random_odd_digit():
+	return random.choice([1, 3, 5, 7, 9])
+
+
+print(random_odd_digit())
+
+
+# ------------------------------------------------
+
+# class as decorator
+
+class Elephant:
+	
+	def __init__(self, func):
+		self._func = func
+		self._memory = []
+	
+	def __call__(self):  # make elephant object instance callable
+		retval = self._func()
+		self._memory.append(retval)
+		return retval
+	
+	def memory(self):
+		return self._memory
+
+
+@Elephant
+def random_odd_digit():
+	return random.choice([1, 3, 5, 7, 9])
+
+
+print(random_odd_digit())
+print(random_odd_digit.memory())
+print(random_odd_digit())
+print(random_odd_digit.memory())
+
+'''
+PROPERTY
+
+'''
+
+
+class Employee:
+	def __init__(self, first, last):
+		self.first = first
+		self.last = last
+	
+	# self.email = first + '.' + last + '@email.com'
+	
+	@property
+	def email(self):
+		return '{}.{}@email.com'.format(self.first, self.last)
+	
+	@property
+	def fullname(self):
+		return '{} {}'.format(self.first, self.last)
+	
+	@fullname.setter
+	def fullname(self, fn):
+		first, last = fn.split(' ')
+		self.first = first
+		self.last = last
+	
+	@fullname.deleter
+	def fullname(self):
+		print('Delete Name!')
+		self.first = None
+		self.last = None
+
+
+emp_1 = Employee('John', 'Smith')
+print(emp_1.fullname)
+# print(emp_1.fullname()) -> @property: print(emp_1.fullname)
+print(emp_1.email)
+
+emp_1.first = 'Jim'
+print(emp_1.first)
+# John.Smith@email.com
+# print(emp_1.email()) -> @property: print(emp_1.email
+print(emp_1.email)
+print(emp_1.fullname)
+
+emp_1.fullname = 'Corey Schafer'
+print(emp_1.fullname)
+print(emp_1.email)
+
+del (emp_1.fullname)
 
 # ------------------------------------------------
 '''
@@ -797,4 +1047,271 @@ def fib(num):
 
 for item in fib(10):
 	print(item)
+# ------------------------------------------------
 
+'''
+REGULAR EXPRESSIONS
+
+'''
+import re
+
+text_to_search = 'abc deFGH IJ01 23456789 ._'
+
+pattern = re.compile(r'\bI')
+
+matches = pattern.finditer(text_to_search)
+# matches = pattern.findall(text_to_search)
+
+for match in matches:
+	print(match)
+
+
+'''
+MULTIPROCESSING
+
+'''
+
+import time
+
+NUMBERS = 50000, 50001, 50002, 50003
+
+
+def factorial(n):
+	""" great for multiprocessing:
+
+	- CPU bound
+	- referentially transparent n -> f(n)
+
+	"""
+	
+	print('start: factorial({})'.format(n))
+	f = 1
+	for i in range(1, n + 1):
+		f *= i
+	print('done: factorial({})'.format(n))
+	return f
+
+
+# t0 = time.time()
+# result = []
+# for n in NUMBERS:
+# 	result.append(factorial(n))
+# t1 = time.time()
+# print('Execution took {:.4f}'.format(t1 - t0))
+#
+# t0 = time.time()
+# result = list(map(factorial, NUMBERS))
+# t1 = time.time()
+# print('Execution took {:.4f}'.format(t1 - t0))
+
+import multiprocessing as mp
+
+t0 = time.time()
+with mp.Pool() as pool:
+	result = pool.map(factorial, NUMBERS)
+t1 = time.time()
+print('Execution took {:.4f}'.format(t1 - t0))
+
+
+'''
+Profi Tips from Raymond Hettinger on Youtube
+
+'''
+
+import os
+import threading
+
+names = ['raymond', 'rachel', 'matthew']
+colors = ['red', 'green', 'blue', 'yellow']
+
+# 1
+for i in range(len(colors)):
+	print(colors[i])
+# 2
+print(sorted(colors, key=len))
+# 3
+for i in range(len(colors) - 1, -1, -1):
+	print(colors[i])
+# 4
+for color in reversed(colors):
+	print(color)
+# 5
+for i in range(len(colors)):
+	print(i, '-->', colors[i])
+# 6
+for i, color in enumerate(colors):
+	print(i, '-->', colors[i])
+# 7
+n = min(len(names), len(colors))
+for i in range(n):
+	print(names[i], '-->', colors[i])
+# 8
+for name, color in zip(names, colors):
+	print(name, '-->', color)
+# 9
+for color in sorted(colors, reverse=True):
+	print(color)
+# 10
+print(sorted(colors, key=len))
+
+d = {'matthew': 'blue', 'rachel': 'green', 'raymond': 'red'}
+
+# 11
+print(d)
+for k in d:
+	print(k)
+# 12
+# for k in d.keys():
+#	if k.startswith('r'):
+#		del d[k]
+# 13
+for k in d:
+	print(k, '-->', d[k])
+# 14
+for k, v in d.items():
+	print(k, '-->', v)
+
+names = ['raymond', 'rachel', 'matthew']
+colors = ['red', 'green', 'blue', 'yellow']
+
+# 15
+d = dict(zip(names, colors))
+print(d)
+
+colors = ['red', 'green', 'blue', 'yellow', 'red', 'green', 'blue', 'red']
+# 16 Counting in dictionaries
+d = {}
+for color in colors:
+	if color not in d:
+		d[color] = 0
+	d[color] += 1
+print(d)
+# 17
+d = {}
+for color in colors:
+	d[color] = d.get(color, 0) + 1
+
+names = ['raymond', 'rachel', 'matthew', 'roger', 'betty', 'melissa']
+
+# 18
+from collections import defaultdict
+
+d = defaultdict(int)
+for color in colors:
+	d[color] += 1
+
+# 19 Grouping in dictionaries
+d = {}
+for name in names:
+	key = len(name)
+	if key not in d:
+		d[key] = []
+	d[key].append(name)
+print(d)
+
+# 20
+d = {}
+for name in names:
+	key = len(name)
+	d.setdefault(key, []).append(name)
+print(d)
+
+# 21
+d = defaultdict(list)
+for name in names:
+	key = len(name)
+	d[key].append(name)
+
+d = {'matthew': 'blue', 'rachel': 'green', 'raymond': 'red'}
+
+# 22
+while d:
+	key, value = d.popitem()
+	print(key, '-->', value)
+
+
+# 22 Updating multiple state variables
+
+def fibonacci(n):
+	x, y = 0, 1
+	for i in range(n):
+		print(x)
+		x, y = y, x + y
+
+
+fibonacci(10)
+
+names = ['raymond', 'rachel', 'matthew', 'roger', 'betty', 'melissa']
+
+# 23 Concatenating Strings
+s = names[0]
+for name in names:
+	s += ', ' + name
+print(s)
+
+# 24
+print(', '.join(names))
+
+# Updating sequencies
+
+# 25
+del names[0]
+names.pop(0)
+names.insert(0, 'mark')
+
+# 26
+from collections import deque
+
+names = deque(['raymond', 'rachel', 'matthew', 'roger', 'betty', 'melissa'])
+
+del names[0]
+names.popleft()
+names.appendleft('mark')
+
+# Caching decorator
+# usable for pure functions (function has same result with same arguments)
+
+# 27
+from functools import wraps
+
+
+def cache(func):
+	saved = {}
+	
+	@wraps(func)
+	def newfunc(*args):
+		if args in saved:
+			return newfunc(*args)
+		result = func(*args)
+		saved[args] = result
+		return result
+	
+	return newfunc
+
+
+# How to use locks
+# make a lock:
+lock = threading.Lock
+
+# old way to use a lock:
+lock.acquire()
+try:
+	print('critical section')
+finally:
+	lock.release()
+
+# new way:
+with lock:
+	print('critical section')
+
+# Factor out temporary contexts
+
+# old way:
+try:
+	os.remove('somefile.tmp')
+except OSError:
+	pass
+
+# new way:
+# with ignored(OSError):
+# os.remove('somefile.tmp')
