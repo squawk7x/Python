@@ -8,6 +8,7 @@ python -m pydoc -b -> The best!
 python -m pydoc -w <name> -> create own documentation od <name>
 
 '''
+import socket
 
 '''
 INTERACTIVE HELP
@@ -196,7 +197,7 @@ STRINGS
 name = 'Python'
 print(f'Hello {name} {[1, 2, 3]}')
 
-string_plus = """I'm
+string_plus = """I'm text
 	in "several" lines"""
 print(string_plus)
 
@@ -251,7 +252,7 @@ MULTIPLE ASSIGNMENT / VALUE SWAP
 '''
 x, y = 1, 2
 
-# swaping values
+# swapping values
 x, y = y, x
 
 '''
@@ -294,7 +295,7 @@ SORT BY KEY
 '''
 
 lst = [[1, 2], [3, 4], [4, 2], [-1, 3], [4, 5], [2, 3]]
-lst.sort()  # by first element, no Python function for 2nd element -> lamda
+lst.sort()  # by first element, no Python function for 2nd element -> lambda
 print(lst)
 lst.sort(key=lambda x: x[1])
 print(lst)
@@ -330,8 +331,7 @@ sorted(xs.items(), key=operator.itemgetter(1))
 
 # -------------------------------------------------
 
-data = [{'name': 'Max', 'age': 6},
-        {'name': 'Lisa', 'age': 20},
+data = [{'name': 'Max', 'age': 6}, {'name': 'Lisa', 'age': 20},
         {'name': 'Ben', 'age': 9}]
 
 # sort by name:
@@ -360,7 +360,7 @@ file_contents = f.read()
 f.close()
 
 # automatic close file -> Contextmanager:
-# also other ressources (threads, databases, ...)
+# also other resources (threads, databases, ...)
 with open('test.txt', 'r') as f:
 	file_contents = f.read()
 
@@ -405,7 +405,8 @@ next(it)
 for i, item in enumerate(['a', 'b', 'c']):
 	print(i, item)
 
-list(enumerate(enumerate(['a', 'b', 'c'])))  # [(0, (0, 'a')), (1, (1, 'b')), (2, (2, 'c'))]
+list(enumerate(enumerate(
+	['a', 'b', 'c'])))  # [(0, (0, 'a')), (1, (1, 'b')), (2, (2, 'c'))]
 
 '''
 UNPACKING
@@ -523,6 +524,7 @@ import builtins
 print(dir(builtins))
 
 # -------------------------------------------------
+
 
 x = 'global x'
 
@@ -655,7 +657,8 @@ DECORATORS
 
 def decorator_function(original_function):
 	def wrapper_function(*args, **kwargs):
-		print('wrapper executed this before {}'.format(original_function.__name__))
+		print('wrapper executed this before {}'.format(
+			original_function.__name__))
 		return original_function(*args, **kwargs)
 	
 	return wrapper_function
@@ -686,7 +689,8 @@ class decorator_class():
 		self.original_function = original_function
 	
 	def __call__(self, *args, **kwargs):
-		print('call method executed this before {}'.format(self.original_function.__name__))
+		print('call method executed this before {}'.format(
+			self.original_function.__name__))
 		return self.original_function(*args, **kwargs)
 
 
@@ -893,11 +897,11 @@ MUTABLE / IMMUTABLE
 
 a = 'Corey'
 print(a)
-print('Adress of a is: {}'.format(id(a)))
+print('Address of a is: {}'.format(id(a)))
 
 a = 'John'
 print(a)
-print('Adress of a is: {}'.format(id(a)))  # different address
+print('Address of a is: {}'.format(id(a)))  # different address
 
 a[0] = 'c'  # TypeError
 
@@ -905,11 +909,11 @@ a[0] = 'c'  # TypeError
 
 a = [1, 2, 3, 4, 5]
 print(a)
-print('Adress of a is: {}'.format(id(a)))
+print('Address of a is: {}'.format(id(a)))
 
 a[0] = 6
 print(a)
-print('Adress of a is: {}'.format(id(a)))  # same address
+print('Address of a is: {}'.format(id(a)))  # same address
 
 # ------------------------------------------------
 
@@ -939,6 +943,23 @@ print(expensive_func(10))
 print(expensive_func(4))
 
 print(ef_cache)
+
+from functools import lru_cache
+
+
+@lru_cache(maxsize=1000)
+def fibonacci(n):
+	if n == 1:
+		return 1
+	elif n == 2:
+		return 1
+	elif n > 2:
+		return fibonacci(n - 2) + fibonacci(n - 1)
+
+
+for n in range(100):
+	print(f'{n}: {fibonacci(n)}')
+	print(f'ratio:', fibonacci(n) / fibonacci(n - 1))
 
 # ------------------------------------------------
 
@@ -1018,7 +1039,8 @@ age = 28
 # print(greeting)
 
 # String Interpolation:
-greeting = 'I am {age} years old and my name is {name}'.format(name=name, age=age)
+greeting = 'I am {age} years old and my name is {name}'.format(name=name,
+                                                               age=age)
 print(greeting)
 
 # ------------------------------------------------
@@ -1065,7 +1087,6 @@ matches = pattern.finditer(text_to_search)
 for match in matches:
 	print(match)
 
-
 '''
 MULTIPROCESSING
 
@@ -1111,7 +1132,6 @@ with mp.Pool() as pool:
 	result = pool.map(factorial, NUMBERS)
 t1 = time.time()
 print('Execution took {:.4f}'.format(t1 - t0))
-
 
 '''
 Profi Tips from Raymond Hettinger on Youtube
@@ -1252,7 +1272,7 @@ print(s)
 # 24
 print(', '.join(names))
 
-# Updating sequencies
+# Updating sequences
 
 # 25
 del names[0]
@@ -1315,3 +1335,48 @@ except OSError:
 # new way:
 # with ignored(OSError):
 # os.remove('somefile.tmp')
+
+# ------------------------------------------------
+'''
+CONTEXT MANAGER
+
+'''
+
+
+def file_open(filename):
+	f = open(filename, 'w')
+	f.write('hello\n')  # Eception here, the file will never be closed!
+	f.close()
+
+
+def file_open_better(filename):
+	with open(filename, 'w') as f:
+		f.write('hello\n')
+
+
+def try_finally(host, port):
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	try:
+		s.connect((host, port))
+		s.sendall(b'Hello')
+	finally:
+		s.close()
+
+
+def try_finally_better(host, port):
+	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+		s.connect((host, port))
+		s.sendall(b'Hello')
+
+
+'''
+WALRUS OPERATOR :=
+
+'''
+
+print(x := 123)
+
+print([y for x in range(10) if (y := x ** 2) % 2 == 0])
+
+while (name := input('Enter your name: ')) != 'exit':
+	print('Hello', name)

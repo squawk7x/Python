@@ -5,3 +5,6 @@ keyboard
 keyboard-master
 *Test*
 *.txt
+/settings.gradle
+/gradlew.bat
+/gradlew
