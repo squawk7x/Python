@@ -451,7 +451,7 @@ first_val = getattr(person, first_key)
 print(first_val)
 
 
-class Person():
+class Person:
 	pass
 
 
@@ -469,6 +469,252 @@ username = input('Username: ')
 password = getpass('Password: ')
 
 # Konsole: python -m modulname
+
+# ------------------------------------------------
+
+'''
+ENCAPSULATION
+
+'''
+
+
+class Person:
+	
+	def __init__(self, name, age, gender):
+		self.__name = name
+		self.__age = age
+		self.__gender = gender
+	
+	@property
+	def name(self):
+		return self.__name
+	
+	@name.setter
+	def name(self, name):
+		self.__name = name
+	
+	@staticmethod  # works without any object, no self!
+	def mymethod():
+		print('Hello World')
+
+
+Person.mymethod()  # works in class directly
+
+p1 = Person('Mike', 20, 'm')
+
+print(p1.name)
+p1.mymethod()  # but call by instance works as well
+
+'''
+TYPE HINTING
+
+'''
+import mypy  # -> restrictive
+
+
+def myfunction(myparameter: int) -> str:
+	# without mypy  :int works like comment, not restrictive
+	return myparameter
+
+
+myfunction('Hello World')
+
+'''
+FACTORY DESIGN PATTERN / OOP
+
+'''
+
+from abc import ABCMeta, abstractmethod
+
+
+class IPerson(metaclass=ABCMeta):
+	
+	@abstractmethod
+	def person_method(self):
+		""" Interface Method """
+	
+	@abstractmethod
+	def print_data(self):
+		""" Implement child class """  # see singleton
+
+
+class Student(IPerson):
+	
+	def __init__(self):
+		self.name = 'Basic Student Name'
+	
+	def person_method(self):
+		print('I am a student')
+
+
+class Teacher(IPerson):
+	
+	def __init__(self):
+		self.name = 'Basic Teacher Name'
+	
+	def person_method(self):
+		print('I am a teacher')
+
+
+class PersonFactory:
+	
+	@staticmethod
+	def build_person(person_type):
+		if person_type == 'Student':
+			return Student()
+		if person_type == 'Teacher':
+			return Teacher()
+		
+		print('Invalid Type')
+		return -1
+
+
+if __name__ == '__main__':
+	choice = input('What type of person to create?\n')
+	person = PersonFactory.build_person(choice)
+	person.person_method()
+
+'''
+PROXY DESIGN PATTERN / OOP
+
+'''
+
+
+# from abc import ABCMeta, abstractmethod
+
+class Person(IPerson):
+	def person_method(self):
+		print('I am a person')
+
+
+class ProxyPerson(IPerson):  # Proxy Middleman class
+	
+	def __init__(self):
+		self.person = Person()
+	
+	def person_method(self):
+		print('I am the proxy functionality')
+		self.person.person_method()
+
+
+p1 = Person()
+p1.person_method()
+
+p2 = ProxyPerson()
+p2.person_method()
+
+'''
+SINGLETON DESIGN PATTERN / OOP
+
+a class has only one instance = singleton
+
+'''
+
+
+# from abc import ABCMeta, abstractmethod
+
+class PersonSingleton(IPerson):
+	__instance = None  # singleton instance
+	
+	def person_method(self):
+		print('I am a singleton')
+	
+	@staticmethod
+	def get_instance():
+		if PersonSingleton.__instance == None:
+			PersonSingleton('Default Name', 0)
+		return PersonSingleton.__instance
+	
+	def __init__(self, name, age):
+		if PersonSingleton.__instance is not None:
+			raise Exception('Singleton cannot be instantiated more than once')
+		else:
+			self.name = name
+			self.age = age
+			PersonSingleton.__instance = self
+	
+	@staticmethod
+	def print_data():
+		print(f'Name: {PersonSingleton.__instance.name}, Age: '
+		      f'{PersonSingleton.__instance.age}')
+
+
+p1 = PersonSingleton('Mike', 30)
+print(p1)
+p1.print_data()
+
+p2 = PersonSingleton('Mike', 30)
+print(p2)
+p2.print_data()
+# Exception: Singleton cannot be instantiated more than once
+
+
+'''
+COMPOSITE DESIGN PATTERN / OOP
+
+
+'''
+
+
+class IDepartment(metaclass=ABCMeta):
+	
+	@abstractmethod
+	def __init__(self, employees):
+		""" implement in child class """
+		
+	@abstractmethod
+	def print_department(self):
+		""" implement in child class """
+		
+		
+class Accounting(IDepartment):
+	
+	def __init__(self, employees):
+		self.employees = employees
+		
+	def print_department(self):
+		print(f'Accounting Department: {self.employees}')
+
+
+class Development(IDepartment):
+	
+	def __init__(self, employees):
+		self.employees = employees
+	
+	def print_department(self):
+		print(f'Development Department: {self.employees}')
+
+
+class ParentDepartment(IDepartment):
+	
+	def __init__(self, employees):
+		self.employees = employees
+		self.base_employees = employees
+		self.sub_depts = []
+		
+	def add(self, dept):
+		self.sub_depts.append(dept)
+		self.employees += dept.employees
+		
+	def print_department(self):
+		print(f'Parent Department: {self.employees}')
+	
+		for dept in self.sub_depts:
+			dept.print_department()
+			
+		print(f'Total number of employees: {self.employees}')
+		
+		
+dept1 = Accounting(200)
+dept2 = Development(170)
+
+parent_dept = ParentDepartment(30)
+parent_dept.add(dept1)
+parent_dept.add(dept2)
+
+parent_dept.print_department()
+# ------------------------------------------------
+
 
 '''
 ARGUMENT EVALUATION
@@ -1069,6 +1315,35 @@ def fib(num):
 
 for item in fib(10):
 	print(item)
+
+import sys
+
+
+def mygenerator(n):
+	for x in range(n):
+		yield x ** 3
+
+
+values = mygenerator(1_000_000)
+print(sys.getsizeof(values))
+
+print(next(values))
+print(next(values))
+print(next(values))
+
+
+def infinite_sequence():
+	result = 1
+	while True:
+		yield result
+		result *= 5
+
+
+values = infinite_sequence()
+
+print(next(values))
+print(next(values))
+print(next(values))
 # ------------------------------------------------
 
 '''

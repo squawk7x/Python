@@ -1,10 +1,13 @@
-##
-##
-##
+'''
+TUTORIAL
+
+'''
 
 # AN INFORMAL INTRODUCTION TO PYTHON
 
 # 3.1.2 Strings
+import random
+from builtins import Exception
 
 print('C:\some\name')  # here \n means newline!
 # C:\some
@@ -384,12 +387,9 @@ def cheeseshop(kind, *arguments, **keywords):
 		print(kw, ":", keywords[kw])
 
 
-cheeseshop(
-	"Limburger",
-	"It's very runny, sir.", "It's really very, VERY runny, sir.",
-	shopkeeper="Michael Palin",
-	client="John Cleese",
-	sketch="Cheese Shop Sketch")
+cheeseshop("Limburger", "It's very runny, sir.",
+           "It's really very, VERY runny, sir.", shopkeeper="Michael Palin",
+           client="John Cleese", sketch="Cheese Shop Sketch")
 
 # -- Do you have any Limburger ?
 # -- I'm sorry, we're all out of Limburger
@@ -740,11 +740,7 @@ print([str(round(pi, i)) for i in range(1, 6)])
 
 # 5.1.4 Nested List Comprehensions
 
-matrix = [
-	[1, 2, 3, 4],
-	[5, 6, 7, 8],
-	[9, 10, 11, 12]
-]
+matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
 
 # matrix'
 [[row[i] for row in matrix] for i in range(4)]
@@ -769,11 +765,7 @@ print(transposed)
 
 ##
 
-matrix = [
-	[1, 2, 3, 4],
-	[5, 6, 7, 8],
-	[9, 10, 11, 12]
-]
+matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]
 
 # Transposed matrix'
 list(zip(*matrix))
@@ -1132,8 +1124,8 @@ print('{1} and {0}'.format('spam', 'eggs'))
 # eggs and spam
 
 
-print('This {food} is {adjective}.'.format(
-	food='spam', adjective='absolutely horrible'))
+print('This {food} is {adjective}.'.format(food='spam',
+                                           adjective='absolutely horrible'))
 # This spam is absolutely horrible.
 
 print('The story of {0}, {1}, and {other}.'.format('Bill', 'Manfred',
@@ -1188,7 +1180,8 @@ print('The value of pi is approximately %5.3f.' % math.pi)
 f = open('workfile', 'r')
 f.close()
 
-with open('workfile') as f:  # 'with' automatically closes file after use !!! See page 67
+with open(
+		'workfile') as f:  # 'with' automatically closes file after use !!! See page 67
 	read_data = f.read()
 f.closed
 # True
@@ -1379,7 +1372,8 @@ try:
 except Exception as inst:
 	print(type(inst))  # the exception instance
 	print(inst.args)  # arguments stored in .args
-	print(inst)  # __str__ allows args to be printed directly, but may be overridden in exception subclasses
+	print(
+		inst)  # __str__ allows args to be printed directly, but may be overridden in exception subclasses
 	x, y = inst.args  # unpack args
 	print('x =', x)
 	print('y =', y)
@@ -1497,8 +1491,8 @@ for line in open("myfile.txt"):
 
 with open("myfile.txt") as f:
 	for line in f:
-		print(line, end="")
-	#  the context manager will ensure correct closing of the file upon exiting the ``with`` statement, even if an exception was raised.
+		print(line,
+		      end="")  # the context manager will ensure correct closing of the file upon exiting the ``with`` statement, even if an exception was raised.
 
 ##
 
@@ -1961,3 +1955,301 @@ os.getcwd()
 # 'C:\\Python39'
 
 dir(os)
+
+'''
+FAQs
+
+'''
+
+x = 10
+
+
+def bar():
+	print(x)
+
+
+bar()
+# 10
+
+# ------------------------------------------------
+
+x = 10
+
+
+def foo():
+	print(x)
+	x += 1
+
+
+foo()
+# UnboundLocalError: local variable 'x' referenced before assignment
+
+# ------------------------------------------------
+
+x = 10
+
+
+def foobar():
+	global x
+	print(x)
+	x += 1
+
+
+foobar()
+
+
+# ------------------------------------------------
+def foo():
+	x = 10
+	
+	def bar():
+		nonlocal x
+		print(x)
+		x += 1
+	
+	bar()
+	print(x)
+
+
+foo()
+
+# ------------------------------------------------
+squares = []
+for x in range(5):
+	squares.append(x)
+print(squares)
+# [0, 1, 2, 3, 4]
+
+
+squares = []
+for x in range(5):
+	squares.append(lambda: x ** 2)
+print(squares)
+# [<function <lambda> at 0x7f9e459a8820>,
+# <function <lambda> at 0x7f9e4581d670>,
+# <function <lambda> at 0x7f9e4581d040>,
+# <function <lambda> at 0x7f9e4581d310>,
+# <function <lambda> at 0x7f9e4581d790>]
+squares[2]()
+# 16
+
+# ------------------------------------------------
+squares = []
+for x in range(5):
+	squares.append(lambda n=x: n ** 2)
+squares[2]()  # 4
+
+
+# ------------------------------------------------
+
+def foo(x, mydict={}):  # Danger: shared reference to one dict for all calls
+	# ... compute something ...
+	mydict[x] = x ** 2
+	return mydict
+
+
+foo(2)
+foo(3)
+
+
+# {2: 4, 3: 9}
+
+# ------------------------------------------------
+def foo(x, mydict=None):
+	if mydict is None:
+		mydict = {}  # create a new dict for local namespace
+	mydict[x] = x ** 2
+	return mydict
+
+
+foo(2)
+foo(3)  # {3: 9}
+
+
+# ------------------------------------------------
+# Callers can only provide two parameters and optionally pass _cache by keyword
+def expensive(arg1, arg2, *, _cache={}):
+	if (arg1, arg2) in _cache:
+		return _cache[(arg1, arg2)]
+	
+	# Calculate the value
+	result = '... expensive computation ...'
+	_cache[(arg1, arg2)] = result  # Store result in the cache
+	return result
+
+
+# ------------------------------------------------
+x = []
+y = x  # not copy but creating a reference variable
+y.append(10)  # lists ae mutable
+y
+# [10]
+x
+
+
+# ------------------------------------------------
+class Namespace:
+	def __init__(self, /, **args):
+		for key, value in args.items():
+			setattr(self, key, value)
+	
+	def func4(args):
+		args.a = 'new-value'  # args is a mutable Namespace
+		args.b = args.b + 1  # change object in-place
+
+
+args = Namespace(a='old-value', b=99)
+# func4(args)
+vars(args)
+
+
+# {'a': 'new-value', 'b': 100}
+# ------------------------------------------------
+def linear(a, b):
+	def result(x):
+		return a * x + b
+	
+	return result
+
+
+class Linear:
+	def __init__(self, a, b):
+		self.a, self.b = a, b
+	
+	def __call__(self, x):
+		return self.a * x + self.b
+
+
+class Exponential(Linear):
+	
+	# init inherited
+	def __call__(self, x):
+		return self.a * (x ** self.b)
+
+
+f = linear(2, 3)
+f(1)
+
+g = Linear(4, 5)
+g(1)
+
+e = Exponential(2, 3)
+e(4)
+
+
+# ------------------------------------------------
+
+class Counter:
+	value = 0
+	
+	def set(self, x):
+		self.value = x
+	
+	def up(self):
+		self.value = self.value + 1
+	
+	def down(self):
+		self.value = self.value - 1
+
+
+count = Counter()
+inc, dec, reset = count.up, count.down, count.set
+
+inc()
+dec()
+reset()
+
+# ------------------------------------------------
+import copy
+
+l1 = [1, 2, 3]
+l2 = l1.copy()
+l3 = copy.deepcopy(l1)
+
+# ------------------------------------------------
+# Ternary Operator
+# [on_true] if [expression] else [on_false]
+
+x, y = 50, 25
+small = x if x < y else y
+
+# ------------------------------------------------
+help(divmod)
+
+# ------------------------------------------------
+1 .__class__
+# <class 'int'>
+
+(1).__class__
+
+
+# <class 'int'>
+
+
+# ------------------------------------------------
+def a():
+	print("input was 'go'")
+
+
+def b():
+	print("input was 'stop'")
+
+
+while True:
+	
+	dispatch = {'go': a, 'stop': b}
+	# Note lack of parens for funcs
+	
+	dispatch[input()]()
+	# Note trailing parens to call function
+
+# ------------------------------------------------
+class Foo:
+    def do_foo(self):
+        pass
+
+    def do_bar(self):
+        pass
+
+foo = Foo()
+
+f = getattr(foo, 'do_' + opname)
+f(foo)
+
+
+# ------------------------------------------------
+def myFunc():
+    print("hello")
+
+fname = "myFunc"
+
+f = locals()[fname]
+f()
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
+
+# ------------------------------------------------
