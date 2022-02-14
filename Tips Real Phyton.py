@@ -1,46 +1,73 @@
 
+
 # ------------------------------------------------------------
+# itertools.permutations() generates permutations
+# for an iterable. Time to brute-force those passwords ;-)
+
+import itertools
+
+for p in itertools.permutations('ABCD'):
+	print(p)
+
 # ------------------------------------------------------------
+# collections.Counter lets you find the most common
+# elements in an iterable:
+
+import collections
+
+c = collections.Counter('helloworld')
+
+print(c)
+# Counter({'l': 3, 'o': 2, 'e': 1, 'd': 1, 'h': 1, 'r': 1, 'w': 1})
+
+c.most_common(3)
+# [('l', 3), ('o', 2), ('e', 1)]
+
+# ------------------------------------------------------------
+
 # Function argument unpacking
 
 def myfunc(x, y, z):
 	print(x, y, z)
 
+
 tuple_vec = (1, 0, 1)
 dict_vec = {'x': 1, 'y': 0, 'z': 1}
 
 myfunc(*tuple_vec)
-#1, 0, 1
+# 1, 0, 1
 
 myfunc(*dict_vec)
-#x, y, z
+# x, y, z
 myfunc(**dict_vec)
-#1, 0, 1
+# 1, 0, 1
 # ------------------------------------------------------------
 
 # The standard string repr for dicts is hard to read:
 
 my_mapping = {'a': 23, 'b': 42, 'c': 0xc0ffee}
-my_mapping
-#{'b': 42, 'c': 12648430. 'a': 23}
+
+print(my_mapping)
+# {'b': 42, 'c': 12648430. 'a': 23}
 
 
 # The "json" module can do a much better job:
 
 import json
+
 print(json.dumps(my_mapping, indent=4, sort_keys=True))
 
-#{
+# {
 #	"a": 23,
 #	"b": 42,
 #	"c": 12648430
-#}
+# }
 
 
 # Note this only works with dicts containing
 # primitive types (check out the "pprint" module):
 json.dumps({all: 'yup'})
-#TypeError: keys must be a string
+# TypeError: keys must be a string
 
 # ------------------------------------------------------------
 

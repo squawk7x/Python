@@ -18,6 +18,11 @@ dir()
 dir(__builtins__)
 help(pow)
 
+'''
+DOCSTRINGS
+
+'''
+
 
 def empty_func():
 	"""empty function"""
@@ -25,6 +30,21 @@ def empty_func():
 
 
 help(empty_func)
+
+
+def myexpo(num1, num2):
+	'''
+	This function takes one number to the power of another number
+	
+	:param num1: This is the base
+	:param num2: This is the exponent
+	:return: The result num1 ** num2
+	'''
+	
+	return num1 ** num2
+
+
+print(myexpo(8, 2))
 
 '''
 DATETIME
@@ -85,6 +105,65 @@ for key in messages.keys():
 
 for key, value in messages.items():
 	print(key, '-->', value)
+
+'''
+DICTIONARY
+
+** keywords argument operator: passes a dict into another dict
+
+'''
+
+dict1 = {'a': 1, 'b': 2}
+dict2 = {'b': 7, 'c': 4}
+
+# dict1.update(dict2)
+dict3 = dict1 | dict2
+print(dict3)
+
+# unpredictable 'b':
+dict4 = dict(dict1.items() | dict2.items())
+print(dict4)
+
+dict5 = {**dict1, **dict2}
+print(dict5)
+
+'''
+ZIP / UNZIP
+
+'''
+
+names = ('Mike', 'Bob', 'Anna')
+ages = (20, 23, 27)
+
+zipped = list(zip(names, ages))
+print(zipped)
+# [('Mike', 20), ('Bob', 23), ('Anna', 27)]
+
+names, ages = zip(*zipped)
+print(names)
+print(ages)
+
+# connect lists via zip
+letters = ['b', 'd', 'a', 'c']
+numbers = [3, 2, 4, 1]
+
+data = sorted(zip(letters, numbers))
+print(data)
+# [('a', 4), ('b', 3), ('c', 1), ('d', 2)]
+
+data = sorted(zip(numbers, letters))
+print(data)
+# [(1, 'c'), (2, 'd'), (3, 'b'), (4, 'a')]
+
+letters, numbers = zip(*data)
+print(letters)
+print(numbers)
+
+letters = ['b', 'd', 'a', 'c']
+numbers = [3, 2, 4, 1]
+# 2 list into dict
+mydict = dict(zip(letters, numbers))
+print(mydict)
 
 '''
 LIST <--> TUPLE
@@ -167,7 +246,8 @@ MAP FUNCTION
 
 # map(func, *iterables) --> map object
 
-list(map(lambda _: _ ** 2, (1, 2, 3, 4, 5)))
+list(map(lambda x: x ** 2, (1, 2, 3, 4, 5)))
+
 
 '''
 FILTER FUNCTION
@@ -271,8 +351,10 @@ print(x)
 TERNARY CONDITION (INLINE CONDITION)
 
 '''
+age = 20
 
-x = 1 if 2 > 3 else 0
+adult = True if age >= 18 else False
+print('You are an adult!' if adult else 'You are not an adult!')
 
 '''
 for else & while else
@@ -661,17 +743,17 @@ class IDepartment(metaclass=ABCMeta):
 	@abstractmethod
 	def __init__(self, employees):
 		""" implement in child class """
-		
+	
 	@abstractmethod
 	def print_department(self):
 		""" implement in child class """
-		
-		
+
+
 class Accounting(IDepartment):
 	
 	def __init__(self, employees):
 		self.employees = employees
-		
+	
 	def print_department(self):
 		print(f'Accounting Department: {self.employees}')
 
@@ -691,20 +773,20 @@ class ParentDepartment(IDepartment):
 		self.employees = employees
 		self.base_employees = employees
 		self.sub_depts = []
-		
+	
 	def add(self, dept):
 		self.sub_depts.append(dept)
 		self.employees += dept.employees
-		
+	
 	def print_department(self):
 		print(f'Parent Department: {self.employees}')
-	
+		
 		for dept in self.sub_depts:
 			dept.print_department()
-			
+		
 		print(f'Total number of employees: {self.employees}')
-		
-		
+
+
 dept1 = Accounting(200)
 dept2 = Development(170)
 
