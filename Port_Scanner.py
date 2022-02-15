@@ -25,6 +25,7 @@ def worker():
 		if portscan(port):
 			print("Port {} is open!".format(port))
 
-for x in range (30):
+
+for x in range(30):
 	t = threading.Thread(target=worker)
 	t.start()

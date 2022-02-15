@@ -1491,7 +1491,8 @@ t1 = time.time()
 print('Execution took {:.4f}'.format(t1 - t0))
 
 '''
-Profi Tips from Raymond Hettinger on Youtube
+Raymond Hettinger
+	Profi Tips
 
 '''
 
@@ -1737,3 +1738,153 @@ print([y for x in range(10) if (y := x ** 2) % 2 == 0])
 
 while (name := input('Enter your name: ')) != 'exit':
 	print('Hello', name)
+
+'''
+ALTERNATIVE CONSTRUCTOR
+
+'''
+
+print(dict.fromkeys(['raymond', 'rachel', 'matthew']))
+
+'''
+Raymond Hettinger
+	Summary: Toolset for New-Style Classes
+
+1. Inherit from object() // old
+2. Instance variables: 
+	for information unique to an instance
+3. Class variables: 
+	for data shared among all instances
+4. Regular methods: 
+	need 
+		'self' 
+	to operate on instance data
+5. Class methods: 
+	implement alternative constructors. They need 
+		'cls'
+	so they can create subclass instances as well.
+6. Static methods: 
+	attach functions to classes. 
+	They don't need 'self' or 'cls'.
+	Static methods improve discoverability and require context to be specified.
+7. A propoerty(): // old
+    lets getter and setter methods invoked automatically by attribute access.
+    This allows Python classes to freely expose their instance variables.
+8. The __slots__ variable
+	implements the Flyweight Design Pattern by suppressinginstance dictionaries
+	
+	
+'''
+
+'''
+Raymond Hettinger
+	The Art of Subclassing
+	
+	InstDict1   --->
+	InstDict2   --->    SubClassDict   ---> ParClassDict
+	InstDict3   --->
+	
+	A Subclass delegates work to another class
+	A Subclass and its parents are just two different dictionaries that contain functions
+	A Subclass points to its parent
+	The pointer means: 'I delegate work to this class'
+
+	Classes are dictionaries of functions
+	Subclasses point to other dictionaries to reuse their code
+	The Subclasses are in complete control of what happens
+	
+	LISKOV SUBSTTUTION PRINCIPLE:
+	"If S is a subtype of T, then objects of type T 
+	may be replaced with objects of type S" 
+	
+		-> POLYMORPHISM & SUBSTITUTABILITY
+
+'''
+
+'''
+Raymond Hettinger
+	super considered super
+	
+	Linearisation:
+	
+	MRO Method Resolution Order
+	super in Python does not call parents, 
+	but parents from the children
+	super means "next in line", starting from youngest child
+	
+	!!!
+	-> children get called before their parents
+	-> parents get called in the order listed
+	-> parents stay in order
+	!!!
+	-> multiple inheritance: use keyword arguments
+		(you can not know who you are calling)
+	
+'''
+
+class A:
+	pass
+
+class B(A):
+	pass
+
+class C(B):
+	pass
+
+class D(C, B):
+	pass
+
+help(D)
+
+'''
+Raymond Hettinger
+	Namespaces
+	
+'''
+
+d = dict()
+d['raymond'] = 'red'
+d['raymond']
+
+x = 10
+globals()['x']
+print(x)
+
+globals()['x'] = 11
+print(x)
+
+from types import SimpleNamespace
+
+ns = SimpleNamespace(x=99, y=100)
+print(ns)
+
+print(ns.x)
+print(ns.y)
+
+#  dict()   globals()   SimpleNamespace
+#  d['x']      x            ns.x
+
+# emulate dictionaries
+
+n = 8
+
+#karr
+karr = [[] for i in range(n)]
+varr = [[] for i in range(n)]
+
+print(n)
+print(karr)
+print(varr)
+
+key, value = 'raymond', 'red'
+i = hash(key) % n
+print(i)
+
+karr[i].append(key)
+varr[i].append(value)
+
+print(karr)
+print(varr)
+
+#[[], [], ['raymond'], [], [], [], [], []]
+#[[], [], ['red'], [], [], [], [], []]
