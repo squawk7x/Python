@@ -344,6 +344,7 @@ if __name__ == '__main__':
 	OrganicPizza().order_pizza('Sausage', 'Mushroom')
 	print(help(OrganicPizza))
 
+
 # --------------------------------------------------------------
 
 class Robot:
@@ -364,7 +365,8 @@ class Robot:
 		print('Physical Movement! Replacing')
 
 
-class CleaningRobot(Robot):  # CleaningRobot is a Robot, not has a Robot
+class CleaningRobot(Robot):  # CleaningRobot 'is a' Robot, not 'has a' Robot
+
 	def clean(self, tool, times=10):
 		super().fetch(tool)
 		for i in range(times):
@@ -399,7 +401,9 @@ class MockBot(Robot):
 
 class MockedCleaningRobot(CleaningRobot, MockBot):
 	""" Injects a mock bot into the robot dependency """
-	# it checks Mockbot *before* Robot is checked
+
+
+# it checks Mockbot *before* Robot is checked
 
 
 import unittest
@@ -411,8 +415,8 @@ class TestCleaningRobot(unittest.TestCase):
 		t = MockedCleaningRobot()
 		t.clean('mop')
 		expected = (['fetching mop'] +
-		            ['forward mop', 'backward mop'] * 10 +
-		            ['replacing mop'])
+					['forward mop', 'backward mop'] * 10 +
+					['replacing mop'])
 
 		self.assertEqual(t.tasks, expected)
 
