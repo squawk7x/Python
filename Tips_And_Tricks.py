@@ -40,7 +40,7 @@ def myexpo(num1, num2):
 	:param num2: This is the exponent
 	:return: The result num1 ** num2
 	'''
-	
+
 	return num1 ** num2
 
 
@@ -247,7 +247,6 @@ MAP FUNCTION
 # map(func, *iterables) --> map object
 
 list(map(lambda x: x ** 2, (1, 2, 3, 4, 5)))
-
 
 '''
 FILTER FUNCTION
@@ -561,20 +560,20 @@ ENCAPSULATION
 
 
 class Person:
-	
+
 	def __init__(self, name, age, gender):
 		self.__name = name
 		self.__age = age
 		self.__gender = gender
-	
+
 	@property
 	def name(self):
 		return self.__name
-	
+
 	@name.setter
 	def name(self, name):
 		self.__name = name
-	
+
 	@staticmethod  # works without any object, no self!
 	def mymethod():
 		print('Hello World')
@@ -610,43 +609,43 @@ from abc import ABCMeta, abstractmethod
 
 
 class IPerson(metaclass=ABCMeta):
-	
+
 	@abstractmethod
 	def person_method(self):
 		""" Interface Method """
-	
+
 	@abstractmethod
 	def print_data(self):
 		""" Implement child class """  # see singleton
 
 
 class Student(IPerson):
-	
+
 	def __init__(self):
 		self.name = 'Basic Student Name'
-	
+
 	def person_method(self):
 		print('I am a student')
 
 
 class Teacher(IPerson):
-	
+
 	def __init__(self):
 		self.name = 'Basic Teacher Name'
-	
+
 	def person_method(self):
 		print('I am a teacher')
 
 
 class PersonFactory:
-	
+
 	@staticmethod
 	def build_person(person_type):
 		if person_type == 'Student':
 			return Student()
 		if person_type == 'Teacher':
 			return Teacher()
-		
+
 		print('Invalid Type')
 		return -1
 
@@ -670,10 +669,10 @@ class Person(IPerson):
 
 
 class ProxyPerson(IPerson):  # Proxy Middleman class
-	
+
 	def __init__(self):
 		self.person = Person()
-	
+
 	def person_method(self):
 		print('I am the proxy functionality')
 		self.person.person_method()
@@ -697,16 +696,16 @@ a class has only one instance = singleton
 
 class PersonSingleton(IPerson):
 	__instance = None  # singleton instance
-	
+
 	def person_method(self):
 		print('I am a singleton')
-	
+
 	@staticmethod
 	def get_instance():
 		if PersonSingleton.__instance == None:
 			PersonSingleton('Default Name', 0)
 		return PersonSingleton.__instance
-	
+
 	def __init__(self, name, age):
 		if PersonSingleton.__instance is not None:
 			raise Exception('Singleton cannot be instantiated more than once')
@@ -714,7 +713,7 @@ class PersonSingleton(IPerson):
 			self.name = name
 			self.age = age
 			PersonSingleton.__instance = self
-	
+
 	@staticmethod
 	def print_data():
 		print(f'Name: {PersonSingleton.__instance.name}, Age: '
@@ -739,51 +738,51 @@ COMPOSITE DESIGN PATTERN / OOP
 
 
 class IDepartment(metaclass=ABCMeta):
-	
+
 	@abstractmethod
 	def __init__(self, employees):
 		""" implement in child class """
-	
+
 	@abstractmethod
 	def print_department(self):
 		""" implement in child class """
 
 
 class Accounting(IDepartment):
-	
+
 	def __init__(self, employees):
 		self.employees = employees
-	
+
 	def print_department(self):
 		print(f'Accounting Department: {self.employees}')
 
 
 class Development(IDepartment):
-	
+
 	def __init__(self, employees):
 		self.employees = employees
-	
+
 	def print_department(self):
 		print(f'Development Department: {self.employees}')
 
 
 class ParentDepartment(IDepartment):
-	
+
 	def __init__(self, employees):
 		self.employees = employees
 		self.base_employees = employees
 		self.sub_depts = []
-	
+
 	def add(self, dept):
 		self.sub_depts.append(dept)
 		self.employees += dept.employees
-	
+
 	def print_department(self):
 		print(f'Parent Department: {self.employees}')
-		
+
 		for dept in self.sub_depts:
 			dept.print_department()
-		
+
 		print(f'Total number of employees: {self.employees}')
 
 
@@ -859,12 +858,12 @@ x = 'global x'
 
 def outer():
 	x = 'outer x'
-	
+
 	def inner():
 		nonlocal x
 		x = 'inner x'
 		print(x)
-	
+
 	inner()
 	print(x)
 
@@ -942,7 +941,7 @@ CLOSURES
 def logger(msg):
 	def log_message():
 		print('Log:', msg)
-	
+
 	return log_message
 
 
@@ -953,7 +952,7 @@ log_hi()
 def html_tag(tag):
 	def wrap_text(msg):
 		print('<{0}>{1}</{0}>'.format(tag, msg))
-	
+
 	return wrap_text
 
 
@@ -967,7 +966,7 @@ print_h1('Another Headline!')
 def outer_function(msg):
 	def inner_function():
 		print(msg)
-	
+
 	return inner_function()
 
 
@@ -988,7 +987,7 @@ def decorator_function(original_function):
 		print('wrapper executed this before {}'.format(
 			original_function.__name__))
 		return original_function(*args, **kwargs)
-	
+
 	return wrapper_function
 
 
@@ -1012,10 +1011,10 @@ display_info('John', 25)
 
 
 class decorator_class():
-	
+
 	def __init__(self, original_function):
 		self.original_function = original_function
-	
+
 	def __call__(self, *args, **kwargs):
 		print('call method executed this before {}'.format(
 			self.original_function.__name__))
@@ -1047,7 +1046,7 @@ def mapper(func):
 	def inner(values):
 		"""This is the inner()"""
 		return [func(value) for value in values]
-	
+
 	return inner
 
 
@@ -1075,7 +1074,7 @@ from functools import wraps
 
 def cache(func):
 	saved = {}
-	
+
 	@wraps(func)
 	def newfunc(*args):
 		if args in saved:
@@ -1083,7 +1082,7 @@ def cache(func):
 		result = func(*args)
 		saved[args] = result
 		return result
-	
+
 	return newfunc
 
 
@@ -1095,9 +1094,9 @@ def power_of(exponent):
 	def decorator(func):
 		def inner():
 			return func() ** exponent
-		
+
 		return inner
-	
+
 	return decorator
 
 
@@ -1116,9 +1115,9 @@ def power_of(arg):
 	def decorator(func):
 		def inner():
 			return func() ** exponent
-		
+
 		return inner
-	
+
 	if callable(arg):
 		exponent = 2
 		return decorator(arg)
@@ -1140,16 +1139,16 @@ print(random_odd_digit())
 # class as decorator
 
 class Elephant:
-	
+
 	def __init__(self, func):
 		self._func = func
 		self._memory = []
-	
+
 	def __call__(self):  # make elephant object instance callable
 		retval = self._func()
 		self._memory.append(retval)
 		return retval
-	
+
 	def memory(self):
 		return self._memory
 
@@ -1174,23 +1173,23 @@ class Employee:
 	def __init__(self, first, last):
 		self.first = first
 		self.last = last
-	
+
 	# self.email = first + '.' + last + '@email.com'
-	
+
 	@property
 	def email(self):
 		return '{}.{}@email.com'.format(self.first, self.last)
-	
+
 	@property
 	def fullname(self):
 		return '{} {}'.format(self.first, self.last)
-	
+
 	@fullname.setter
 	def fullname(self, fn):
 		first, last = fn.split(' ')
 		self.first = first
 		self.last = last
-	
+
 	@fullname.deleter
 	def fullname(self):
 		print('Delete Name!')
@@ -1461,7 +1460,7 @@ def factorial(n):
 	- referentially transparent n -> f(n)
 
 	"""
-	
+
 	print('start: factorial({})'.format(n))
 	f = 1
 	for i in range(1, n + 1):
@@ -1655,7 +1654,7 @@ from functools import wraps
 
 def cache(func):
 	saved = {}
-	
+
 	@wraps(func)
 	def newfunc(*args):
 		if args in saved:
@@ -1663,7 +1662,7 @@ def cache(func):
 		result = func(*args)
 		saved[args] = result
 		return result
-	
+
 	return newfunc
 
 
@@ -1822,17 +1821,22 @@ Raymond Hettinger
 	
 '''
 
+
 class A:
 	pass
+
 
 class B(A):
 	pass
 
+
 class C(B):
 	pass
 
+
 class D(C, B):
 	pass
+
 
 help(D)
 
@@ -1868,7 +1872,7 @@ print(ns.y)
 
 n = 8
 
-#karr
+# karr
 karr = [[] for i in range(n)]
 varr = [[] for i in range(n)]
 
@@ -1886,5 +1890,5 @@ varr[i].append(value)
 print(karr)
 print(varr)
 
-#[[], [], ['raymond'], [], [], [], [], []]
-#[[], [], ['red'], [], [], [], [], []]
+# [[], [], ['raymond'], [], [], [], [], []]
+# [[], [], ['red'], [], [], [], [], []]
