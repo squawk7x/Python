@@ -190,7 +190,6 @@ Raymond Hettinger
 
 
 class A:
-
 	class_a_var = 0
 
 	# __slots__ =
@@ -199,8 +198,9 @@ class A:
 		self.instance_a_var = 'instance a variable'
 		self.property_a_var = 'property a variable'
 		# 2 possibilities to access class_var:
-		A.class_a_var = 1     # not added to a.__dict__
-		#self.class_var = 2  # added to a.__dict__
+		A.class_a_var = 1  # not added to a.__dict__
+
+	# self.class_var = 2  # added to a.__dict__
 
 	def regular_a_method(self):
 		print('regular a method')
@@ -232,8 +232,8 @@ print(a.__dict__, '\n')
 
 a.regular_a_method()
 
-print(a.property_a_method)    # access like a variable
-a.property_a_method = 'new property a variable' # setting like a variable
+print(a.property_a_method)  # access like a variable
+a.property_a_method = 'new property a variable'  # setting like a variable
 print(a.property_a_method)
 
 del a.property_a_method
@@ -243,7 +243,6 @@ A.set_class_a_var('new class a variable')
 print(A.class_a_var)
 
 A.static_a_method()
-
 
 '''
 Raymond Hettinger
@@ -271,8 +270,8 @@ Raymond Hettinger
 
 '''
 
-class B(A):
 
+class B(A):
 	class_b_var = 100
 
 	def __init__(self, var):
@@ -281,15 +280,13 @@ class B(A):
 
 	pass
 
-#print(help(B))
+
+# print(help(B))
 
 b = B(200)
 
 print(isinstance(b, A))
 print(issubclass(B, A))
-
-
-
 
 '''
 Raymond Hettinger
@@ -346,3 +343,79 @@ if __name__ == '__main__':
 
 	OrganicPizza().order_pizza('Sausage', 'Mushroom')
 	print(help(OrganicPizza))
+
+# --------------------------------------------------------------
+
+class Robot:
+	""" Sophisticated class that moves a real robot """
+
+	# Don't wear down real robots by running tests!
+
+	def fetch(self, tool):
+		print('Physical Movement! Fetching')
+
+	def move_forward(self, tool):
+		print('Physical Movement! Moving forward')
+
+	def move_backward(self, tool):
+		print('Physical Movement! Moving backward')
+
+	def replace(self, tool):
+		print('Physical Movement! Replacing')
+
+
+class CleaningRobot(Robot):  # CleaningRobot is a Robot, not has a Robot
+	def clean(self, tool, times=10):
+		super().fetch(tool)
+		for i in range(times):
+			super().move_forward(tool)
+			super().move_backward(tool)
+		super().replace(tool)
+
+
+# if __name__ == '__main__':
+# 	t = CleaningRobot()
+# 	t.clean('broom')
+
+
+class MockBot(Robot):
+	""" Simulate a real robot by merely recording tasks """
+
+	def __init__(self):
+		self.tasks = []
+
+	def fetch(self, tool):
+		self.tasks.append('fetching %s' % tool)
+
+	def move_forward(self, tool):
+		self.tasks.append('forward %s' % tool)
+
+	def move_backward(self, tool):
+		self.tasks.append('backward %s' % tool)
+
+	def replace(self, tool):
+		self.tasks.append('replacing %s' % tool)
+
+
+class MockedCleaningRobot(CleaningRobot, MockBot):
+	""" Injects a mock bot into the robot dependency """
+	# it checks Mockbot *before* Robot is checked
+
+
+import unittest
+
+
+class TestCleaningRobot(unittest.TestCase):
+
+	def test_clean(self):
+		t = MockedCleaningRobot()
+		t.clean('mop')
+		expected = (['fetching mop'] +
+		            ['forward mop', 'backward mop'] * 10 +
+		            ['replacing mop'])
+
+		self.assertEqual(t.tasks, expected)
+
+
+if __name__ == '__main__':
+	unittest.main()
